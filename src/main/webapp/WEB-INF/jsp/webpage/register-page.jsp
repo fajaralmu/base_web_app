@@ -68,12 +68,16 @@
 				requestObject, function(xhr) {
 					var response = xhr.data;
 					var msg;
+					var color;
 					if (response != null) {
 						msg = response.message;
+						color = response.code == "00" ? "green" : "red";
 					} else {
 						msg = "SERVER ERROR";
+						color = "red";
 					}
 					usernameAvailabilityInfo.innerHTML = msg;
+					usernameAvailabilityInfo.style.color = color;
 				});
 	}
 
@@ -81,6 +85,8 @@
 
 		if (rePasswordField.value != passwordField.value) {
 			alert("Password does not match!");
+			
+			return;
 		}
 
 		const requestObject = {
