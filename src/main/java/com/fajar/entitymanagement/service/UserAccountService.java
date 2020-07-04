@@ -102,7 +102,7 @@ public class UserAccountService {
 		if (sessionRequestUri != null) {
 			log.debug("goto page after login: " + sessionRequestUri);
  
-			httpResponse.setHeader("location", sessionRequestUri);
+			httpResponse.setHeader("location", sessionRequestUri); 
 //			response.setRedirectUrl(sessionRequestUri);
 		}
 		response.setMessage(requestIdResponse.getMessage());
@@ -167,6 +167,15 @@ public class UserAccountService {
 		log.info("Role From User: {}", user.getRole());
 		Optional<UserRole> dbUserRole = userRoleRepository.findById(user.getRole().getId());
 		return dbUserRole.get();
+	}
+
+	public WebResponse checkUsername(WebRequest request) {
+		String username = request.getUsername();
+		User user = userRepository.findByUsername(username);
+		String code = user == null ? "00":"01";
+		String msg = user == null ? "Username Available": "Username Not Available";
+		
+		return WebResponse.builder().code(code).message(msg).build();
 	}
 
 }

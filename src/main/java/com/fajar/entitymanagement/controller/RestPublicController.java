@@ -6,6 +6,7 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import com.fajar.entitymanagement.annotation.Authenticated;
 import com.fajar.entitymanagement.dto.WebRequest;
 import com.fajar.entitymanagement.dto.WebResponse;
 import com.fajar.entitymanagement.service.LogProxyFactory;
+import com.fajar.entitymanagement.service.UserAccountService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @Authenticated(loginRequired = false)
 public class RestPublicController extends BaseController {
  
+	@Autowired
+	private UserAccountService userAccountService;
 
 	@PostConstruct
 	public void init() {
@@ -50,6 +54,12 @@ public class RestPublicController extends BaseController {
 	public WebResponse getCurrentPageCode(HttpServletRequest request, HttpServletResponse response) {
 		validatePageRequest(request);
 		return WebResponse.builder().code(super.activePage(request)).build();
+	}
+	
+	@PostMapping(value = "/checkusername")
+	public WebResponse checkUsernameAvailability(@RequestBody WebRequest request, HttpServletRequest httpServletRequest, HttpServletResponse response) {
+
+		return userAccountService.checkUsername(request);
 	}
 
 	@PostMapping(value = "/menus/{pageCode}")

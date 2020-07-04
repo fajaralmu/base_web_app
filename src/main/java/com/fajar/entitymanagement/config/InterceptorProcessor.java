@@ -60,7 +60,7 @@ public class InterceptorProcessor {
 			}else {
 				msg = "Request Not Authenticated";
 			}
-			
+			response.setStatus(400);
 			response.getWriter()
 					.write(objectMapper.writeValueAsString(WebResponse.failed(msg)));
 			response.setHeader("error_message", "Invalid Authentication");
