@@ -1,0 +1,19 @@
+.entity-input-form {
+	layout: fixed;
+	display: grid;
+	grid-row-gap: 1em;
+	grid-column-gap: 1em;
+	/*
+			defined in 'form-element.jsp' file
+		*/
+	/*grid-template-columns:  ${"auto ".repeat(entityProperty.formInputColumn)} */
+}
+
+.nowrap{
+	white-space: nowrap
+}
+
+.form-section{
+	border: solid 1px gray;
+	border-radius: 15px;
+}
