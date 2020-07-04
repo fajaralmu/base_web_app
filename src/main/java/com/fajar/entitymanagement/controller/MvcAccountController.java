@@ -47,24 +47,25 @@ public class MvcAccountController extends BaseController {
 		return basePage;
 	}
 
-	@RequestMapping(value = { "/logout" })
-	@Authenticated
-	public String logout(Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
-		if (userSessionService.hasSession(request, false)) {
-			userSessionService.logout(request);
-		}
-
-		model.addAttribute("pageUrl", "shop/login-page");
-		model.addAttribute("page", "login");
-		return basePage;
-	}
+//	@RequestMapping(value = { "/logout" })
+//	@Authenticated
+//	public String logout(Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
+//		if (userSessionService.hasSession(request, false)) {
+//			userSessionService.logout(request);
+//		}
+//
+//		model.addAttribute("pageUrl", "shop/login-page");
+//		model.addAttribute("page", "login");
+//		return basePage;
+//	}
 
 	@RequestMapping(value = { "/register" })
+	@CustomRequestInfo(pageUrl = "webpage/register-page", title="Register", stylePaths = "loginpage")
 	public String register(Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		if (userSessionService.hasSession(request)) {
 			response.sendRedirect(request.getContextPath() + "/admin/home");
-		}
-		return "shop/register-page";
+		} 
+		return basePage;
 	}
 
 }

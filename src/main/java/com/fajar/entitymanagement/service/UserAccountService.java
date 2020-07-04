@@ -26,15 +26,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserAccountService {
 
-
 	@Autowired
 	private UserSessionService userSessionService;
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
 	private UserRoleRepository userRoleRepository;
-	@PersistenceContext
-	private EntityManager entityManager;
+	@Autowired
+	private WebConfigService webConfigService;
 
 	@PostConstruct
 	public void init() {
@@ -47,20 +46,19 @@ public class UserAccountService {
 	 * @param request
 	 * @return
 	 */
-	@Transactional
 	public WebResponse registerUser(WebRequest request) {
-		WebResponse response = new WebResponse();
-		Optional<UserRole> regularRoleOpt = userRoleRepository.findById(2L);
 
-		if (regularRoleOpt.isPresent() == false) {
-			throw new RuntimeException("ROLE WITH ID: 2 NOT FOUND");
+		try {
+			UserRole defaultUserRole = webConfigService.defaultRole();
+			User user = populateUser(request, defaultUserRole);
+			userRepository.save(user);
+			
+			log.info("success register");
+			return WebResponse.success();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
 		}
-		UserRole regularRole = regularRoleOpt.get();
-
-		User user = populateUser(request, regularRole);
-		 entityManager.persist(user);
-		response.setUser(user);
-		return response;
 	}
 
 	private User populateUser(WebRequest request, UserRole regularRole) {
@@ -83,7 +81,7 @@ public class UserAccountService {
 	 * @throws IllegalAccessException
 	 */
 	public WebResponse login(WebRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse)
-			throws  Exception {
+			throws Exception {
 		User dbUser = userSessionService.getUserByUsernameAndPassword(request);
 
 		if (dbUser == null) {
@@ -91,19 +89,21 @@ public class UserAccountService {
 		}
 
 		dbUser = userSessionService.addUserSession(dbUser, httpRequest, httpResponse);
-		WebResponse requestIdResponse = userSessionService.requestId(httpRequest, httpResponse); 
-		SessionUtil.setSessionRegisteredRequestId(httpRequest, requestIdResponse); 
-		
+		WebResponse requestIdResponse = userSessionService.requestId(httpRequest, httpResponse);
+		SessionUtil.setSessionRegisteredRequestId(httpRequest, requestIdResponse);
+
 		WebResponse response = new WebResponse("00", "success");
-		response.setEntity(dbUser); 
-		
+		response.setEntity(dbUser);
+
 		log.info("LOGIN SUCCESS");
 
 		String sessionRequestUri = SessionUtil.getSessionRequestUri(httpRequest);
-		
+
 		if (sessionRequestUri != null) {
-			log.info("WILL REDIRECT TO REQUESTED URI: " + sessionRequestUri);
-			response.setRedirectUrl(sessionRequestUri);
+			log.debug("goto page after login: " + sessionRequestUri);
+ 
+			httpResponse.setHeader("location", sessionRequestUri);
+//			response.setRedirectUrl(sessionRequestUri);
 		}
 		response.setMessage(requestIdResponse.getMessage());
 		return response;

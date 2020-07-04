@@ -1,6 +1,6 @@
 package com.fajar.entitymanagement.service.entity;
 
-import static com.fajar.entitymanagement.service.EntityService.*;
+import static com.fajar.entitymanagement.service.EntityService.ORIGINAL_PREFFIX;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,28 +19,28 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class ProductUpdateService extends BaseEntityUpdateService{
+public class ProductUpdateService extends BaseEntityUpdateService {
 
 	@Autowired
 	private ProductRepository productRepository;
-//	@Autowired
-//	private ProductInventoryService productInventoryService;
-	
+
 	/**
 	 * add & update product
+	 * 
 	 * @param product
 	 * @param newRecord
 	 * @return
 	 */
 	@Override
-	public WebResponse saveEntity(BaseEntity baseEntity, boolean newRecord,EntityUpdateInterceptor entityUpdateInterceptor) {
+	public WebResponse saveEntity(BaseEntity baseEntity, boolean newRecord,
+			EntityUpdateInterceptor entityUpdateInterceptor) {
 
 		Product product = (Product) copyNewElement(baseEntity, newRecord);
 
 		String imageData = product.getImageUrl();
 		if (imageData != null && !imageData.equals("")) {
 			log.info("product image will be updated");
-			
+
 			String[] base64Images = imageData.split("~");
 			if (base64Images != null && base64Images.length > 0) {
 				String[] imageUrls = new String[base64Images.length];
@@ -65,7 +65,7 @@ public class ProductUpdateService extends BaseEntityUpdateService{
 						}
 						if (null != imageName)
 							imageUrls[i] = (imageName);
-						
+
 					} catch (IOException e) {
 
 						product.setImageUrl(null);
@@ -75,9 +75,9 @@ public class ProductUpdateService extends BaseEntityUpdateService{
 
 				List<String> validUrls = removeNullItemFromArray(imageUrls);
 				String[] arrayOfString = CollectionUtil.toArrayOfString(validUrls);
-				
+
 				CollectionUtil.printArray(arrayOfString);
-				
+
 				String imageUrl = String.join("~", arrayOfString);
 				product.setImageUrl(imageUrl);
 
@@ -92,14 +92,13 @@ public class ProductUpdateService extends BaseEntityUpdateService{
 				}
 			}
 		}
-		 
-		
+
 		Product newProduct = entityRepository.save(product);
-		
+
 //		if(newRecord) {
 //			productInventoryService.addNewProduct(newProduct);
 //		}
-		
+
 		return WebResponse.builder().entity(newProduct).build();
 	}
 }

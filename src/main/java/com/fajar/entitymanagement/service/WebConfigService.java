@@ -49,8 +49,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WebConfigService {
 
-	private static final String DEFAULT_ROLE = "00"; 
-	private static final String SETTING = "setting";
+	public static final String DEFAULT_ROLE = "00"; 
+	public static final String SETTING = "setting";
 
 	@Autowired
 	private AppProfileRepository ProfileRepository;
@@ -73,6 +73,8 @@ public class WebConfigService {
 	private String appCode;
 	private String DEFAULT_USER_NAME;
 	private String DEFAULT_USER_PWD;
+//	private Menu defaultMenu;
+//	private Page defaultMenuPage;
 	/////////////////////////////////////////////////////////////
 	
 
@@ -118,7 +120,7 @@ public class WebConfigService {
 		return userRepository.save(user);
 	}
 
-	private UserRole defaultRole() {
+	public UserRole defaultRole() {
 		UserRole userRole = userRoleRepository.findByCode(DEFAULT_ROLE);
 		if (null != userRole) {
 			return userRole;

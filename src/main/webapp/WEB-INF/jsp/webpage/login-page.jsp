@@ -33,14 +33,11 @@
 						} else
 							window.location.href = "<spring:url value="/admin/home" />";
 					} else {
-						alert("LOGIN FAILS");
+						alert("LOGIN FAILED");
 					}
 				});
 	}
-
-	function goToRegister() {
-		window.location.href = "<spring:url value="/account/register" />";
-	}
+ 
 </script>
 <div class="content">
 	<p id="info" align="center"></p>
@@ -54,11 +51,10 @@
 					class="form-control" type="text" />
 				<label for="password">Password</label> 
 				<input id="password" type="password" class="form-control" />
-				<span></span>
-				<button class="btn btn-primary" onclick="login(); return false;">Login</button>
-
-				<!-- <button class="btn btn-success"
-					onclick="goToRegister(); return false;">Register</button> -->
+				 
+				<button class="btn btn-primary" onclick="login(); return false;">Login</button> 
+				<a role="button" class="btn btn-success"
+					href='<spring:url value="/account/register"></spring:url>'>Register</a>  
 
 			</div>
 		</div>
