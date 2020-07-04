@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fajar.entitymanagement.annotation.Authenticated;
+import com.fajar.entitymanagement.annotation.CustomRequestInfo;
 import com.fajar.entitymanagement.dto.WebRequest;
 import com.fajar.entitymanagement.dto.WebResponse;
 import com.fajar.entitymanagement.service.LogProxyFactory;
@@ -36,10 +37,11 @@ public class RestAccountController extends BaseController {
 	}
 
 	@PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@CustomRequestInfo(withRealtimeProgress = true)
 	public WebResponse register(@RequestBody WebRequest request, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse) throws Exception {
 		log.info("register {}", request);
-		WebResponse response = accountService.registerUser(request);
+		WebResponse response = accountService.registerUser(request, httpRequest);
 		return response;
 	}
 

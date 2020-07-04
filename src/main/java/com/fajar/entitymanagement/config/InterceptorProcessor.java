@@ -48,6 +48,7 @@ public class InterceptorProcessor {
 	private ComponentService componentService;
 
 	public InterceptorProcessor() {
+
 		log.info(" //////////// InterceptorProcessor ///////////// ");
 	}
 
@@ -55,14 +56,13 @@ public class InterceptorProcessor {
 		response.setContentType("application/json");
 		try {
 			String msg;
-			if(loginRequired) {
+			if (loginRequired) {
 				msg = "User Not Authenticated";
-			}else {
+			} else {
 				msg = "Request Not Authenticated";
 			}
 			response.setStatus(400);
-			response.getWriter()
-					.write(objectMapper.writeValueAsString(WebResponse.failed(msg)));
+			response.getWriter().write(objectMapper.writeValueAsString(WebResponse.failed(msg)));
 			response.setHeader("error_message", "Invalid Authentication");
 		} catch (IOException e) {
 			log.error("Error writing JSON Error Response: {}", e);
@@ -89,12 +89,12 @@ public class InterceptorProcessor {
 				User authenticatedUser = getAuthenticatedUser(request);
 				SessionUtil.setUserInRequest(request, authenticatedUser);
 			} else {
-				if(!userSessionService.validatePageRequest(request)) {
+				if (!userSessionService.validatePageRequest(request)) {
 					printNotAuthenticated(response, loginRequired);
 					return false;
 				}
 			}
-		}  
+		}
 		return true;
 	}
 
@@ -110,7 +110,7 @@ public class InterceptorProcessor {
 			if (!hasSessionToAccessWebPage(request)) {
 				log.info("URI: {} not authenticated, will redirect to login page", request.getRequestURI());
 				response.setStatus(301);
-				response.setHeader("location", request.getContextPath()+"/account/login");
+				response.setHeader("location", request.getContextPath() + "/account/login");
 //				BaseController.sendRedirectLogin(request, response);
 				return false;
 			}
@@ -251,7 +251,7 @@ public class InterceptorProcessor {
 		}
 
 		if (null != resourcePath && resourcePath.withRealtimeProgress()) {
-			progressService.sendComplete(SessionUtil.getPageRequestId(request));
+			progressService.sendComplete(request);
 		}
 
 	}

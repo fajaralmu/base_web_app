@@ -34,6 +34,8 @@ public class UserAccountService {
 	private UserRoleRepository userRoleRepository;
 	@Autowired
 	private WebConfigService webConfigService;
+	@Autowired
+	private ProgressService progressService;
 
 	@PostConstruct
 	public void init() {
@@ -46,12 +48,14 @@ public class UserAccountService {
 	 * @param request
 	 * @return
 	 */
-	public WebResponse registerUser(WebRequest request) {
+	public WebResponse registerUser(WebRequest request, HttpServletRequest httpServletRequest) {
 
 		try {
 			UserRole defaultUserRole = webConfigService.defaultRole();
+			progressService.sendProgress(30, httpServletRequest);
 			User user = populateUser(request, defaultUserRole);
 			userRepository.save(user);
+			progressService.sendProgress(40, httpServletRequest);
 			
 			log.info("success register");
 			return WebResponse.success();
