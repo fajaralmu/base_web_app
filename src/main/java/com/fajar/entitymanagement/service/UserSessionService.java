@@ -462,10 +462,14 @@ public class UserSessionService {
 	}
 
 	public void setActivePage(HttpServletRequest request, String pageCode) {
+		if(null == pageCode) {
+			log.info("will not setActivePage, pageCode IS NULL");
+			return;
+		}
 		log.info("setActivePage: {}", pageCode);
 		try {
 			SessionUtil.setSessionPageCode(request, pageCode);
-			log.info("pageCode: {}", pageCode);
+			log.info("pageCode: {}", request.getSession().getAttribute("page-code"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

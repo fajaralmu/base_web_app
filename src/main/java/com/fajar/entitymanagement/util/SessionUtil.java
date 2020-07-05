@@ -62,7 +62,7 @@ public class SessionUtil {
 
 	public static void setSessionUser(HttpServletRequest httpRequest, User dbUser) {
 
-		httpRequest.getSession(true).setAttribute(ATTR_USER, dbUser);
+		httpRequest.getSession().setAttribute(ATTR_USER, dbUser);
 	}
 
 	public static void removeSessionUserAndInvalidate(HttpServletRequest request) {
@@ -102,16 +102,18 @@ public class SessionUtil {
 
 	public static String getSessionPageCode(HttpServletRequest request) {
 		try {
+			log.info("getSessionPageCode");
 			return request.getSession().getAttribute(PAGE_CODE).toString();
 		} catch (Exception e) {
-
+			log.error("Error getting {} from session", PAGE_CODE);
+			e.printStackTrace();
 			return null;
 		}
 	}
 
 	public static void setSessionPageCode(HttpServletRequest request, String pageCode) {
 
-		request.getSession(false).setAttribute(PAGE_CODE, pageCode);
+		request.getSession().setAttribute(PAGE_CODE, pageCode);
 	}
 
 	public static String getRequestToken(HttpServletRequest httpRequest) {

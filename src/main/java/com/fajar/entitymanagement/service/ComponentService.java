@@ -62,7 +62,7 @@ public class ComponentService {
 		String uri = request.getRequestURI();
 		String link = uri.replace(request.getContextPath(), "");
 
-		log.info("link: {}", link);
+		log.info("get page from DB with link: {}", link);
 		Page page = pageRepository.findTop1ByLink(link);
 
 		log.info("page from db : {}", page);

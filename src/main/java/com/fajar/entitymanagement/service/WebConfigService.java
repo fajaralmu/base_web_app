@@ -166,7 +166,7 @@ public class WebConfigService {
 		}
 	}
 
-	public Menu defaultMenu() {
+	public Menu checkDefaultMenu() {
 		checkPageManagementMenu();
 		
 		Menu menu = menuRepository.findByCode(SETTING);

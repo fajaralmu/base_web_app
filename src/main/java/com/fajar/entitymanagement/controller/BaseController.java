@@ -113,7 +113,7 @@ public class BaseController {
 		return componentService.getPages(request);
 	}
 
-	@ModelAttribute("year")
+	@ModelAttribute("year") ///required in the footer
 	public int getCurrentYear(HttpServletRequest request) {
 		return DateUtil.getCalendarItem(new Date(), Calendar.YEAR);
 	}
@@ -125,6 +125,11 @@ public class BaseController {
 	public void setActivePage(HttpServletRequest request) {
 
 		String pageCode = componentService.getPageCode(request);
+		userSessionService.setActivePage(request, pageCode);
+	}
+	
+	public void setActivePage(HttpServletRequest request, String pageCode) {
+ 
 		userSessionService.setActivePage(request, pageCode);
 	}
 

@@ -97,6 +97,8 @@ public class MenuInitiationService {
 	}
 
 	private void addNewMenuPage(Class entityClass) {
+		log.info("Will add default menu for: {}", entityClass.getSimpleName());
+		
 		Dto dto = EntityUtil.getClassAnnotation(entityClass, Dto.class);
 		if (null == dto) {
 			return;
@@ -117,17 +119,18 @@ public class MenuInitiationService {
 		menu.setMenuPage(menuPage);
 		menu.setColor("#ffffff");
 		menu.setFontColor("#000000");
-		menu.setDescription("Generated Management Page For: "+entityClass.getSimpleName());
-		
+		menu.setDescription("Generated Management Page For: "+entityClass.getSimpleName()); 
 		
 		MenuRepository.save(menu);
+		
+		log.info("Success Adding Management Menu For: {}", menuCode);
 	}
 
 	private void checkDefaultMenu() { 
-		webConfigService.defaultMenu();
+		webConfigService.checkDefaultMenu();
 	}
 
-	private Menu getMenuByCode(String code) {
+	public Menu getMenuByCode(String code) {
 		return MenuRepository.findByCode(code);
 	}
 
