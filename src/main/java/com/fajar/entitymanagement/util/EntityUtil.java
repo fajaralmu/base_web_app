@@ -21,6 +21,7 @@ import org.apache.commons.lang3.SerializationUtils;
 import com.fajar.entitymanagement.annotation.AdditionalQuestionField;
 import com.fajar.entitymanagement.annotation.Dto;
 import com.fajar.entitymanagement.annotation.FormField;
+import com.fajar.entitymanagement.dto.FieldType;
 import com.fajar.entitymanagement.entity.BaseEntity;
 import com.fajar.entitymanagement.entity.setting.EntityElement;
 import com.fajar.entitymanagement.entity.setting.EntityProperty;
@@ -429,6 +430,28 @@ public class EntityUtil {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	public static List<Field> getFixedListFields(Class<? extends BaseEntity> entityClass) {
+		List<Field> fields = new ArrayList<>();
+		
+		List<Field> declaredFields = getDeclaredFields(entityClass);
+		for (int i = 0; i < declaredFields.size(); i++) {
+			final Field field = declaredFields.get(i);
+			
+			FormField formField = getFieldAnnotation(field, FormField.class);
+			if(null == formField) {
+				continue;
+			}
+			
+			boolean isBaseEntitySubClass = field.getType().getSuperclass().equals(BaseEntity.class);
+			
+			if(isBaseEntitySubClass && formField.type().equals(FieldType.FIELD_TYPE_FIXED_LIST)) {
+				fields.add(field);
+			}
+			
+		}
+		return   fields;
 	}
 
 }

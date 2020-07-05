@@ -102,7 +102,8 @@ public class SessionUtil {
 
 	public static String getSessionPageCode(HttpServletRequest request) {
 		try {
-			log.info("getSessionPageCode");
+			log.info("getSessionPageCode : {}", request.getSession().getAttribute(PAGE_CODE));
+			
 			return request.getSession().getAttribute(PAGE_CODE).toString();
 		} catch (Exception e) {
 			log.error("Error getting {} from session", PAGE_CODE);
@@ -113,7 +114,12 @@ public class SessionUtil {
 
 	public static void setSessionPageCode(HttpServletRequest request, String pageCode) {
 
-		request.getSession().setAttribute(PAGE_CODE, pageCode);
+		try {
+			request.getSession().setAttribute(PAGE_CODE, pageCode);
+		}catch (Exception e) {
+			log.error("Error set session pageCode");
+			e.printStackTrace();
+		}
 	}
 
 	public static String getRequestToken(HttpServletRequest httpRequest) {

@@ -51,6 +51,7 @@ public class WebConfigService {
 
 	public static final String DEFAULT_ROLE = "00"; 
 	public static final String SETTING = "setting";
+	public static final String MENU = "menu";
 	public static final String PAGE = "page";
 	
 	@Autowired
@@ -169,7 +170,7 @@ public class WebConfigService {
 	public Menu checkDefaultMenu() {
 		checkPageManagementMenu();
 		
-		Menu menu = menuRepository.findByCode(SETTING);
+		Menu menu = menuRepository.findByCode(MENU);
 		if (null != menu) {
 			log.info("defaultMenu FOUND!");
 			return menu;
@@ -178,13 +179,14 @@ public class WebConfigService {
 		log.info("WILL SAVE defaultMenu...");
 
 		menu = new Menu();
-		menu.setCode(SETTING);
+		menu.setCode(MENU);
 		menu.setName("Menu Management");
-		menu.setUrl("/management/menu");
+		menu.setUrl("/management/common/menu");
 		Page menuPage = defaultPage();
 		menu.setMenuPage(menuPage);
 		menu.setColor("#ffffff");
 		menu.setFontColor("#000000");
+		menu.setDescription("Default "+MENU+" Page");
 		
 		return menuRepository.save(menu);
 	}

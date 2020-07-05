@@ -103,7 +103,7 @@ public class InterceptorProcessor {
 
 		log.info("intercept webpage handler: {}", request.getRequestURI());
 		boolean authenticationRequired = getAuthenticationAnnotation(handlerMethod) != null;
-
+		
 		log.info("URI: {} requires authentication: {}", request.getRequestURI(), authenticationRequired);
 
 		if (authenticationRequired) {
@@ -123,8 +123,17 @@ public class InterceptorProcessor {
 				progressService.init(SessionUtil.getPageRequestId(request));
 			}
 		}
-
+		
+		this.setActivePage(request);
 		return true;
+	}
+	
+	private void setActivePage(HttpServletRequest httpServletRequest) {
+		//TODO: remove
+		log.debug("httpServletRequest Class: {}", httpServletRequest.getClass().getCanonicalName());
+		
+		String pageCode = componentService.getPageCode(httpServletRequest);
+		userSessionService.setActivePage(httpServletRequest, pageCode);
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -245,9 +254,7 @@ public class InterceptorProcessor {
 			BaseController.addStylePaths(modelAndView, resourcePath.stylePaths());
 			BaseController.addTitle(modelAndView, resourcePath.title());
 			BaseController.addPageUrl(modelAndView, resourcePath.pageUrl());
-
-			String pageCode = componentService.getPageCode(request);
-			userSessionService.setActivePage(request, pageCode);
+ 
 		}
 
 		if (null != resourcePath && resourcePath.withRealtimeProgress()) {

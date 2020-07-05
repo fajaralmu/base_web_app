@@ -13,20 +13,22 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.support.BindingAwareModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fajar.entitymanagement.annotation.Authenticated;
 import com.fajar.entitymanagement.annotation.CustomRequestInfo;
-import com.fajar.entitymanagement.entity.Menu;
 import com.fajar.entitymanagement.entity.Profile;
 import com.fajar.entitymanagement.entity.User;
 import com.fajar.entitymanagement.entity.setting.EntityProperty;
 import com.fajar.entitymanagement.service.EntityManagementPageService;
 import com.fajar.entitymanagement.service.EntityService;
 import com.fajar.entitymanagement.service.LogProxyFactory;
+import com.fajar.entitymanagement.service.WebConfigService;
 import com.fajar.entitymanagement.util.CollectionUtil;
 import com.fajar.entitymanagement.util.EntityUtil;
+import com.fajar.entitymanagement.util.SessionUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,6 +66,14 @@ public class MvcManagementController extends BaseController {
 			HttpServletResponse response) throws Exception {
 
 		model = entityManagementPageService.setModel(request, model, name);
+		try {
+			BindingAwareModelMap modelImpl = (BindingAwareModelMap) model;
+			String pageCode = modelImpl.get(SessionUtil.PAGE_CODE).toString();
+			setActivePage(request, pageCode); 
+			log.info("Management Page Code: {}", request.getSession().getAttribute(SessionUtil.PAGE_CODE));
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 		return basePage;
 	}
 
@@ -76,18 +86,10 @@ public class MvcManagementController extends BaseController {
 		// override singleObject
 		model.addAttribute("entityId", webAppConfiguration.getProfile().getId());
 		model.addAttribute("singleRecord", true);
+		
+		setActivePage(request, WebConfigService.SETTING);  
 		return basePage;
-	}
-
-	@RequestMapping(value = { "/menu" })
-	public String menu(Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-		HashMap<String, List<?>> listObject = new HashMap<>();
-		listObject.put("menuPage", CollectionUtil.convertList(componentService.getAllPages()));
-		EntityProperty entityProperty = EntityUtil.createEntityProperty(Menu.class, listObject);
-		model = constructCommonModel(request, entityProperty, model, "Menu", "management");
-		return basePage;
-	}
+	} 
 
 	/**
 	 * RESTRICTED ACCESS
@@ -107,6 +109,7 @@ public class MvcManagementController extends BaseController {
 		listObject.put("userRole", CollectionUtil.convertList(entityService.getAllUserRole()));
 		EntityProperty entityProperty = EntityUtil.createEntityProperty(User.class, listObject);
 		model = constructCommonModel(request, entityProperty, model, "User", "management");
+		
 		return basePage;
 	}
 

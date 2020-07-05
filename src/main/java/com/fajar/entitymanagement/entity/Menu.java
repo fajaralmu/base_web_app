@@ -41,7 +41,7 @@ public class Menu extends BaseEntity {
 	@FormField
 	@Column
 	private String url;
-	 
+
 	@JoinColumn(name = "page_id", nullable = false)
 	@ManyToOne
 	@FormField(lableName = "Page", type = FieldType.FIELD_TYPE_FIXED_LIST, optionItemName = "name")
@@ -49,7 +49,7 @@ public class Menu extends BaseEntity {
 	@FormField(type = FieldType.FIELD_TYPE_IMAGE, required = false, defaultValue = "DefaultIcon.BMP")
 	@Column(name = "icon_url")
 	private String iconUrl;
-	
+
 	@Override
 	public EntityUpdateInterceptor updateInterceptor() {
 

@@ -20,6 +20,7 @@ import com.fajar.entitymanagement.dto.WebRequest;
 import com.fajar.entitymanagement.dto.WebResponse;
 import com.fajar.entitymanagement.service.LogProxyFactory;
 import com.fajar.entitymanagement.service.UserAccountService;
+import com.fajar.entitymanagement.util.SessionUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,6 +53,7 @@ public class RestPublicController extends BaseController {
 
 	@PostMapping(value = "/pagecode")
 	public WebResponse getCurrentPageCode(HttpServletRequest request, HttpServletResponse response) {
+		
 		validatePageRequest(request);
 		return WebResponse.builder().code(super.activePage(request)).build();
 	}
