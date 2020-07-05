@@ -51,7 +51,7 @@ public class MenuInitiationService {
 	private void checkManagementPage() {
 
 		Page managementPage = getPageByCode(MANAGEMENT);
-		if (null == managementPage) {
+		if (null != managementPage) {
 			log.info("managementPage FOUND");
 			return;
 		}
@@ -116,6 +116,10 @@ public class MenuInitiationService {
 		menu.setMenuPage(menuPage);
 		menu.setColor("#ffffff");
 		menu.setFontColor("#000000");
+		menu.setDescription("Generated Management Page For: "+entityClass.getSimpleName());
+		
+		
+		MenuRepository.save(menu);
 	}
 
 	private void checkDefaultMenu() { 

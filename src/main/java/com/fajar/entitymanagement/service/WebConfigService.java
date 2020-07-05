@@ -206,6 +206,7 @@ public class WebConfigService {
 		menu.setMenuPage(menuPage);
 		menu.setColor("#ffffff");
 		menu.setFontColor("#000000");
+		menu.setDescription("Generated Page Management");
 		
 		menuRepository.save(menu);
 	}
