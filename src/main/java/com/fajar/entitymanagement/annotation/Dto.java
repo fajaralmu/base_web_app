@@ -19,5 +19,6 @@ public @interface Dto {
 	String value() default "";
 	boolean quistionare() default false;
 	Class<? extends BaseEntityUpdateService> updateService() default CommonUpdateService.class;
+	public boolean commonManagementPage() default true;
 	 
 }

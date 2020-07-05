@@ -53,6 +53,7 @@ public class UserAccountService {
 		try {
 			UserRole defaultUserRole = webConfigService.defaultRole();
 			progressService.sendProgress(30, httpServletRequest);
+			
 			User user = populateUser(request, defaultUserRole);
 			userRepository.save(user);
 			progressService.sendProgress(40, httpServletRequest);
