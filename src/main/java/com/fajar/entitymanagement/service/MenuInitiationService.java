@@ -15,6 +15,7 @@ import com.fajar.entitymanagement.entity.Page;
 import com.fajar.entitymanagement.repository.MenuRepository;
 import com.fajar.entitymanagement.repository.PageRepository;
 import com.fajar.entitymanagement.util.EntityUtil;
+import com.fajar.entitymanagement.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -106,7 +107,7 @@ public class MenuInitiationService {
 
 		Menu menu = new Menu();
 		menu.setCode(menuCode);
-		menu.setName(entityClass.getSimpleName() + " Management");
+		menu.setName(StringUtil.extractCamelCase(entityClass.getSimpleName()) + " Management");
 		if (commonPage) {
 			menu.setUrl("/management/common/" + menuCode);
 		} else {
