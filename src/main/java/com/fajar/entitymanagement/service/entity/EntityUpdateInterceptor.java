@@ -1,8 +1,10 @@
 package com.fajar.entitymanagement.service.entity;
 
+import java.io.Serializable;
+
 import com.fajar.entitymanagement.entity.BaseEntity;
 
-public interface EntityUpdateInterceptor<T extends BaseEntity> {
+public interface EntityUpdateInterceptor<T extends BaseEntity> extends Serializable{
 	
 	public T preUpdate(T baseEntity) ;
 

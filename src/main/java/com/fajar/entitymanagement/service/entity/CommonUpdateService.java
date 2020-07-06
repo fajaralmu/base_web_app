@@ -15,13 +15,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class CommonUpdateService extends BaseEntityUpdateService {
+public class CommonUpdateService extends BaseEntityUpdateService<BaseEntity> {
 
 	@Override
-	public WebResponse saveEntity(BaseEntity entity, boolean newRecord, EntityUpdateInterceptor updateInterceptor) {
+	public WebResponse saveEntity(BaseEntity entity, boolean newRecord) {
 		log.info("saving entity: {}", entity.getClass());
-		entity = (BaseEntity) copyNewElement(entity, newRecord);
+		entity = copyNewElement(entity, newRecord);
 
+		EntityUpdateInterceptor<BaseEntity> updateInterceptor = entity.getUpdateInterceptor();
 		validateEntityFields(entity, newRecord);
 		interceptPreUpdate(entity, updateInterceptor);
 		BaseEntity newEntity = entityRepository.save(entity);
@@ -35,7 +36,7 @@ public class CommonUpdateService extends BaseEntityUpdateService {
 	 * @param entity
 	 * @param updateInterceptor
 	 */
-	private void interceptPreUpdate(BaseEntity entity, EntityUpdateInterceptor updateInterceptor) {
+	private void interceptPreUpdate(BaseEntity entity, EntityUpdateInterceptor<BaseEntity> updateInterceptor) {
 
 		if (null != updateInterceptor && null != entity) {
 			log.info("Pre Update {}", entity.getClass().getSimpleName());

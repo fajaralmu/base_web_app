@@ -1,5 +1,6 @@
 package com.fajar.entitymanagement.entity;
 
+import java.beans.Transient;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -117,8 +118,12 @@ public class BaseEntity implements Serializable{
 		}
 	}
 
-	public EntityUpdateInterceptor updateInterceptor() {
-		return new EntityUpdateInterceptor<BaseEntity>() {
+	@JsonIgnore 
+	@Transient
+	public EntityUpdateInterceptor getUpdateInterceptor() {
+		return new EntityUpdateInterceptor<BaseEntity>() { 
+			private static final long serialVersionUID = 2878932467536346251L;
+
 			@Override
 			public BaseEntity preUpdate(BaseEntity baseEntity) {
 				return baseEntity;

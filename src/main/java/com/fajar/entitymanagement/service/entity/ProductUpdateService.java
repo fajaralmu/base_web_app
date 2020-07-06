@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fajar.entitymanagement.dto.WebResponse;
-import com.fajar.entitymanagement.entity.BaseEntity;
 import com.fajar.entitymanagement.entity.Product;
 import com.fajar.entitymanagement.repository.ProductRepository;
 import com.fajar.entitymanagement.util.CollectionUtil;
@@ -19,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class ProductUpdateService extends BaseEntityUpdateService {
+public class ProductUpdateService extends BaseEntityUpdateService<Product> {
 
 	@Autowired
 	private ProductRepository productRepository;
@@ -32,10 +31,9 @@ public class ProductUpdateService extends BaseEntityUpdateService {
 	 * @return
 	 */
 	@Override
-	public WebResponse saveEntity(BaseEntity baseEntity, boolean newRecord,
-			EntityUpdateInterceptor entityUpdateInterceptor) {
+	public WebResponse saveEntity(Product baseEntity, boolean newRecord ) {
 
-		Product product = (Product) copyNewElement(baseEntity, newRecord);
+		Product product =  copyNewElement(baseEntity, newRecord);
 
 		String imageData = product.getImageUrl();
 		if (imageData != null && !imageData.equals("")) {

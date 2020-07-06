@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class BaseEntityUpdateService {
+public class BaseEntityUpdateService<T extends BaseEntity> {
 
 	@Autowired
 	protected FileService fileService;
@@ -31,13 +31,19 @@ public class BaseEntityUpdateService {
 		LogProxyFactory.setLoggers(this);
 	}
 
-	public WebResponse saveEntity(BaseEntity baseEntity, boolean newRecord, EntityUpdateInterceptor updateInterceptor) {
+	public WebResponse saveEntity(T baseEntity, boolean newRecord ) {
 		log.error("saveEntity Method not implemented");
 		return WebResponse.failed("method not implemented");
 	}
 
-	protected BaseEntity copyNewElement(BaseEntity source, boolean newRecord) {
-		return EntityUtil.copyFieldElementProperty(source, source.getClass(), !newRecord);
+	protected T copyNewElement(T source, boolean newRecord) {
+		try {
+			return (T) EntityUtil.copyFieldElementProperty(source, source.getClass(), !newRecord);
+		}catch (Exception e) {
+			log.error("Error copy new element");
+			e.printStackTrace();
+			return source;
+		}
 	}
 
 	protected List<String> removeNullItemFromArray(String[] array) {
@@ -49,5 +55,9 @@ public class BaseEntityUpdateService {
 		}
 		return result;
 
+	}
+	
+	protected EntityUpdateInterceptor<T> getUpdateInterceptor(T baseEntity){
+		return baseEntity.getUpdateInterceptor();
 	}
 }

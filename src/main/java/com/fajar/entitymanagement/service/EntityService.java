@@ -82,8 +82,7 @@ public class EntityService {
 			}
 
 			if (entityValue != null)
-				return updateService.saveEntity((BaseEntity) entityValue, newRecord,
-						entityConfig.getUpdateInterceptor());
+				return updateService.saveEntity((BaseEntity) entityValue, newRecord);
 
 		} catch (Exception e) {
 			e.printStackTrace();

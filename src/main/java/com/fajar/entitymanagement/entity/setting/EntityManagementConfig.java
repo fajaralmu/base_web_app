@@ -20,8 +20,7 @@ public class EntityManagementConfig implements Serializable {
 	private long id;
 	private Class<? extends BaseEntity> entityClass;
 	private BaseEntityUpdateService entityUpdateService;
-	private String fieldName;
-	private EntityUpdateInterceptor updateInterceptor;
+	private String fieldName; 
 
 	public EntityManagementConfig(String fieldName, Class<? extends BaseEntity> entityClass, BaseEntityUpdateService service, EntityUpdateInterceptor updateInterceptor) {
 		this.entityClass = entityClass; 
@@ -30,7 +29,7 @@ public class EntityManagementConfig implements Serializable {
 			fieldName = "entity";
 		}
 		this.fieldName = fieldName;
-		this.updateInterceptor = updateInterceptor;
+//		this.updateInterceptor = updateInterceptor;
 	}
 
 }

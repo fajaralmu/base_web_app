@@ -7,19 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fajar.entitymanagement.dto.WebResponse;
-import com.fajar.entitymanagement.entity.BaseEntity;
 import com.fajar.entitymanagement.entity.Profile;
 import com.fajar.entitymanagement.repository.AppProfileRepository;
 
 @Service
-public class ShopProfileUpdateService extends BaseEntityUpdateService{
+public class ProfileUpdateService extends BaseEntityUpdateService<Profile>{
 
 	@Autowired
 	private AppProfileRepository shopProfileRepository;
 	
 	@Override
-	public WebResponse saveEntity(BaseEntity baseEntity, boolean newRecord,EntityUpdateInterceptor entityUpdateInterceptor) {
-		 Profile shopProfile = (Profile) copyNewElement(baseEntity, newRecord);
+	public WebResponse saveEntity(Profile baseEntity, boolean newRecord) {
+		 Profile shopProfile =  copyNewElement(baseEntity, newRecord);
 		String base64Image = shopProfile.getIconUrl();
 		if (base64Image != null && !base64Image.equals("")) {
 			try {

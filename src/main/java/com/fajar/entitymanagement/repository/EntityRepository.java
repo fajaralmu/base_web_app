@@ -84,7 +84,7 @@ public class EntityRepository {
 				BaseEntityUpdateService updateServiceBean = (BaseEntityUpdateService) applicationContext
 						.getBean(beanName);
 				EntityUpdateInterceptor updateInterceptor = ((BaseEntity) entityClass.newInstance())
-						.updateInterceptor();
+						.getUpdateInterceptor();
 
 				log.info("Registering entity config: {}, updateServiceBean: {}", entityClass.getSimpleName(),
 						updateServiceBean);

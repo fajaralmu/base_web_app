@@ -10,6 +10,7 @@ import com.fajar.entitymanagement.annotation.Dto;
 import com.fajar.entitymanagement.annotation.FormField;
 import com.fajar.entitymanagement.dto.FieldType;
 import com.fajar.entitymanagement.service.entity.EntityUpdateInterceptor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,12 +52,16 @@ public class Menu extends BaseEntity {
 	private String iconUrl;
 
 	@Override
-	public EntityUpdateInterceptor updateInterceptor() {
+	@JsonIgnore
+	public EntityUpdateInterceptor getUpdateInterceptor() {
 
-		return new EntityUpdateInterceptor<Menu>() {
+		return new EntityUpdateInterceptor<Menu>() { 
+			private static final long serialVersionUID = -5435893352707283150L;
 
 			@Override
 			public Menu preUpdate(Menu menu) {
+				System.out.println("****** EntityUpdateInterceptor for Menu *******");
+				
 				if (menu.getUrl().startsWith("/") == false) {
 					menu.setUrl("/" + menu.getUrl());
 				}

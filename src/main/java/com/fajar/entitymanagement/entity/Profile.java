@@ -9,14 +9,14 @@ import javax.persistence.Table;
 import com.fajar.entitymanagement.annotation.Dto;
 import com.fajar.entitymanagement.annotation.FormField;
 import com.fajar.entitymanagement.dto.FieldType;
-import com.fajar.entitymanagement.service.entity.ShopProfileUpdateService;
+import com.fajar.entitymanagement.service.entity.ProfileUpdateService;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Dto(ignoreBaseField = false, updateService = ShopProfileUpdateService.class)
+@Dto(ignoreBaseField = false, updateService = ProfileUpdateService.class)
 @Entity
 @Table(name = "app_profile")
 @Data
