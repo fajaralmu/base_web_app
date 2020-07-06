@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,10 +25,7 @@ import com.fajar.entitymanagement.service.LogProxyFactory;
 @Authenticated
 @RequestMapping("/api/admin")
 public class RestAdminController extends BaseController {
-	Logger log = LoggerFactory.getLogger(RestAdminController.class);
-	  
-	@Autowired
-	private RestPublicController restPublicController;
+	Logger log = LoggerFactory.getLogger(RestAdminController.class); 
 
 	public RestAdminController() {
 		log.info("------------------RestAdminController-----------------");

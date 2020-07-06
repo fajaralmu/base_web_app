@@ -88,8 +88,8 @@ public class DateUtil {
 		"Desember"
 	};
 	
-	public static List<KeyPair> months(){
-		return new ArrayList<KeyPair>() {
+	public static List<KeyPair<String, Integer>> months(){
+		return new ArrayList<KeyPair<String, Integer>>() {
 			/**
 			 * 
 			 */
@@ -97,7 +97,7 @@ public class DateUtil {
 
 			{
 				for (int i = 1; i <=12; i++) {
-					add(new KeyPair(MONTH_NAMES[i - 1] + "("+i+")", i, true));
+					add(new KeyPair<String, Integer>(MONTH_NAMES[i - 1] + "("+i+")", i, true));
 				}
 			}
 		};

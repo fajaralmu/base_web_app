@@ -178,9 +178,10 @@ public class BaseController {
 	}
 
 	private static void addResourcePaths(ModelAndView modelAndView, String resourceName, String... paths) {
-		List<KeyPair> resoucePaths = new ArrayList<>();
+		List<KeyPair<Object, String>> resoucePaths = new ArrayList<>();
 		for (int i = 0; i < paths.length; i++) {
-			resoucePaths.add(KeyPair.builder().value(paths[i]).build());
+			KeyPair<Object, String>  keyPair = new KeyPair<Object, String>(i, paths[i], true);
+			resoucePaths.add(keyPair);
 			log.info("{}. Add {} to {} , value: {}", i, resourceName, modelAndView.getViewName(), paths[i]);
 		}
 		setModelAttribute(modelAndView, resourceName, resoucePaths);

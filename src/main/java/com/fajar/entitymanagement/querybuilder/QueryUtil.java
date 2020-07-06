@@ -221,7 +221,7 @@ public class QueryUtil {
 			}
 			
 			String filterColumnName = getColumnName(field); 
-			KeyPair joinColumnResult = checkIfJoinColumn(currentKey, field, false);
+			KeyPair<String, Object> joinColumnResult = checkIfJoinColumn(currentKey, field, false);
 			
 			if(null != joinColumnResult) {
 				if(joinColumnResult.isValid()) {
@@ -249,10 +249,10 @@ public class QueryUtil {
 	 * @param actualColumnName
 	 * @return
 	 */
-	public static KeyPair checkIfJoinColumn(String currentKey, Field field, boolean actualColumnName) {
+	public static KeyPair<String, Object> checkIfJoinColumn(String currentKey, Field field, boolean actualColumnName) {
 		
 		String multiKeyColumnName = getMultiKeyColumnName(currentKey);
-		KeyPair keyValue = new KeyPair();
+		KeyPair<String, Object> keyValue = new KeyPair<String, Object>();
 		boolean isMultiKey 	= null != multiKeyColumnName; 
 		boolean validColumn = false;
 		
@@ -356,7 +356,7 @@ public class QueryUtil {
 	 * @param filter
 	 * @return
 	 */
-	private static QueryFilterItem getDateFilter(String rawKey, String key, List<Field > fields, Map filter) {
+	private static QueryFilterItem getDateFilter(String rawKey, String key, List<Field > fields, Map<String, Object> filter) {
 		boolean dayFilter 	= rawKey.endsWith(DAY_SUFFIX);
 		boolean monthFilter = rawKey.endsWith(MONTH_SUFFIX);
 		boolean yearFilter 	= rawKey.endsWith(YEAR_SUFFIX);

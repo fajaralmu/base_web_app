@@ -57,7 +57,7 @@ public class EntityRepository {
 	 * @param updateInterceptor
 	 */
 	private void putConfig(Class<? extends BaseEntity> _class, BaseEntityUpdateService updateService,
-			EntityUpdateInterceptor updateInterceptor) {
+			EntityUpdateInterceptor<?> updateInterceptor) {
 		String key = _class.getSimpleName().toLowerCase();
 		entityConfiguration.put(key, config(key, _class, updateService, updateInterceptor));
 	}

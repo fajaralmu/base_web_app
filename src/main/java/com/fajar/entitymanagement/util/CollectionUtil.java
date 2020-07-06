@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.fajar.entitymanagement.dto.KeyPair;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -38,7 +36,7 @@ public class CollectionUtil {
 			List<T> mapValue = map.get(key);
 			if (null == mapValue)
 				continue;
-			
+
 			list.addAll(mapValue);
 		}
 
@@ -51,7 +49,7 @@ public class CollectionUtil {
 		}
 
 		String[] arrayString = toArrayOfString(array);
-		String result =  String.join(", ", arrayString);
+		String result = String.join(", ", arrayString);
 		log.info("Print Array: [{}]", result);
 		return result;
 	}
@@ -63,9 +61,9 @@ public class CollectionUtil {
 		return list;
 	}
 
-	public static <T> List<T> convertList(List<?> list) {
+	public static <T, I> List<T> convertList(List<I> list) {
 		List<T> newList = new ArrayList<T>();
-		for (Object object : list) {
+		for (I object : list) {
 			try {
 				newList.add((T) object);
 			} catch (Exception e) {
@@ -75,13 +73,14 @@ public class CollectionUtil {
 		return newList;
 	}
 
-	public static String[] toArrayOfString(List<?> validUrls) {
-		if (validUrls == null) {
+	public static <T> String[] toArrayOfString(List<T> anyList) {
+		if (anyList == null) {
 			return new String[] {};
 		}
-		String[] array = new String[validUrls.size()];
-		for (int i = 0; i < validUrls.size(); i++) {
-			array[i] = validUrls.get(i).toString();
+		String[] array = new String[anyList.size()];
+		for (int i = 0; i < anyList.size(); i++) {
+			if (anyList.get(i) != null)
+				array[i] = anyList.get(i).toString();
 		}
 		return array;
 	}
@@ -98,20 +97,14 @@ public class CollectionUtil {
 			array[i] = arrays[i].toString();
 		}
 		return array;
-	}
+	} 
 
-	public static List<KeyPair> yearArray(int min, int max){
-		List<KeyPair> years = new ArrayList<>();
-		for(int i = min; i <= max; i++) {
-			years.add(new KeyPair(i, i, true));
-		}
-		return years;
-	}
-	
-	public static <T> boolean emptyArray(T[] array) {
-		if(null == array) return true;
-		if(0 == array.length) return true;
-		
+	public static <T> boolean isEmptyArray(T[] array) {
+		if (null == array)
+			return true;
+		if (0 == array.length)
+			return true;
+
 		return false;
 	}
 }

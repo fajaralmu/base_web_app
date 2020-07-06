@@ -20,7 +20,6 @@ import com.fajar.entitymanagement.dto.WebRequest;
 import com.fajar.entitymanagement.dto.WebResponse;
 import com.fajar.entitymanagement.service.LogProxyFactory;
 import com.fajar.entitymanagement.service.UserAccountService;
-import com.fajar.entitymanagement.util.SessionUtil;
 
 import lombok.extern.slf4j.Slf4j;
 

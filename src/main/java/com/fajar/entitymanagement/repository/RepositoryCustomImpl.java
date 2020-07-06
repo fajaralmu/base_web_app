@@ -7,14 +7,11 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.transaction.SystemException;
 import javax.transaction.Transactional;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,22 +30,20 @@ import lombok.extern.slf4j.Slf4j;
 public class RepositoryCustomImpl implements RepositoryCustom {
 
 	@PersistenceContext
-	private EntityManager entityManager;
-	@Autowired
-	private SessionFactory sessionFactory;
+	private EntityManager entityManager; 
 	@Autowired
 	private Session hibernateSession;
 
 	boolean removeTransactionAfterPersistence = true;
-	
+
 	public boolean isTransactionNotKept() {
 		return removeTransactionAfterPersistence;
 	}
-	
+
 	public void keepTransaction() {
 		this.removeTransactionAfterPersistence = false;
 	}
-	
+
 	public void notKeepingTransaction() {
 		this.removeTransactionAfterPersistence = true;
 	}
@@ -56,46 +51,6 @@ public class RepositoryCustomImpl implements RepositoryCustom {
 	private Transaction currentTransaction;
 
 	public RepositoryCustomImpl() {
-	}
-
-	public void testHibernateSession(Class<? extends BaseEntity> entityClass)
-			throws IllegalStateException, SystemException {
-		Transaction tx = null;
-		try {
-
-			hibernateSession = sessionFactory.openSession();
-
-			tx = hibernateSession.beginTransaction();
-
-			Criteria criteria = hibernateSession.createCriteria(entityClass, entityClass.getSimpleName())
-			// .createAlias("transactionHistory.myCashflowCategory", "myCashflowCategory")
-//					.add(Restrictions.naturalId()
-//							//.set("cifNumber", cif)							
-//							.set("myCashflowCategory.module", module)
-////							.set("sessionIdentifier", UUID.randomUUID().toString())
-//					)
-//					.addOrder(orderDate);
-			;
-			Order orderDate = Order.desc("date");
-//				criteria.setMaxResults(limit);
-//				criteria.setFirstResult(offset);
-
-			List resultList = criteria.list();
-
-			tx.commit();
-
-		} catch (Exception e) {
-			if (tx != null)
-				tx.rollback();
-
-			log.error("Error fetching from DB: {}", e);
-			return;
-
-		} finally {
-
-			if (hibernateSession.isOpen())
-				hibernateSession.close();
-		}
 	}
 
 	@Override
@@ -263,10 +218,10 @@ public class RepositoryCustomImpl implements RepositoryCustom {
 	@Transactional
 	public <T extends BaseEntity> T saveObject(final T rawEntity) {
 
-		if(null == rawEntity) {
+		if (null == rawEntity) {
 			log.error("rawEntity IS NULL");
 		}
-		
+
 		PersistenceOperation<T> persistenceOperation = new PersistenceOperation<T>() {
 
 			@Override
@@ -332,14 +287,14 @@ public class RepositoryCustomImpl implements RepositoryCustom {
 
 			T result = persistenceOperation.doPersist(hibernateSession);
 
-			if(isTransactionNotKept()) {
+			if (isTransactionNotKept()) {
 				currentTransaction.commit();
 				log.info("==**COMMITED Transaction**==");
 			}
 
 			log.info("success persist operation commited: {}", removeTransactionAfterPersistence);
 			return result;
-			
+
 		} catch (Exception e) {
 			log.error("Error persist operation: {}", e);
 
@@ -347,18 +302,18 @@ public class RepositoryCustomImpl implements RepositoryCustom {
 				log.info("Rolling back.... ");
 				currentTransaction.rollback();
 			}
-			notKeepingTransaction(); 
-			
+			notKeepingTransaction();
+
 			e.printStackTrace();
 		} finally {
-			
-			if(isTransactionNotKept()) {
+
+			if (isTransactionNotKept()) {
 				currentTransaction = null;
 			}
 		}
 		return null;
 	}
-	
+
 	public boolean deleteObjectById(Class<? extends BaseEntity> _class, Long id) {
 		PersistenceOperation<Boolean> deleteOperation = new PersistenceOperation<Boolean>() {
 
@@ -366,14 +321,14 @@ public class RepositoryCustomImpl implements RepositoryCustom {
 			public Boolean doPersist(Session hibernateSession) {
 				try {
 					Object existingObject = hibernateSession.load(_class, id);
-					if(null == existingObject) {
+					if (null == existingObject) {
 						log.info("existingObject of {} with id: {} does not exist!!", _class, id);
 						return false;
 					}
 					hibernateSession.delete(existingObject);
 					log.debug("Deleted Successfully");
 					return true;
-				}catch (Exception e) {
+				} catch (Exception e) {
 					log.error("Error deleting object!");
 					e.printStackTrace();
 					return false;
@@ -382,7 +337,7 @@ public class RepositoryCustomImpl implements RepositoryCustom {
 		};
 		try {
 			return this.pesistOperation(deleteOperation);
-		}catch (Exception e) { 
+		} catch (Exception e) {
 			return false;
 		}
 	}

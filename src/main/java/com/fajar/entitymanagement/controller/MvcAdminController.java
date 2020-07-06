@@ -1,7 +1,6 @@
 package com.fajar.entitymanagement.controller;
 
 import java.io.IOException;
-import java.util.Calendar;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -41,15 +40,7 @@ public class MvcAdminController extends BaseController {
 	@RequestMapping(value = { "/home" })
 	@CustomRequestInfo(title = "Dashboard", pageUrl = "webpage/home-page")
 	public String menuDashboard(Model model, HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
-		Calendar cal = Calendar.getInstance();
-
-		if (!userService.hasSession(request)) {
-			sendRedirectLogin(request, response);
-			return basePage;
-		}
-
-		setActivePage(request);
+			throws IOException {  
 
 //		model.addAttribute("menus", componentService.getDashboardMenus(request));
 		model.addAttribute("imagePath", webAppConfiguration.getUploadedImagePath());
