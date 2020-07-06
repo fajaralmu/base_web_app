@@ -15,12 +15,14 @@ import com.fajar.entitymanagement.dto.FormInputColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Dto(formInputColumn = FormInputColumn.ONE_COLUMN, ignoreBaseField = false)
 @Entity
 @Table(name="page")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

@@ -15,12 +15,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Dto(ignoreBaseField = false)
 @Entity
 @Table(name = "menu")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -53,7 +55,7 @@ public class Menu extends BaseEntity {
 
 	@Override
 	@JsonIgnore
-	public EntityUpdateInterceptor getUpdateInterceptor() {
+	public EntityUpdateInterceptor<Menu> getUpdateInterceptor() {
 
 		return new EntityUpdateInterceptor<Menu>() { 
 			private static final long serialVersionUID = -5435893352707283150L;

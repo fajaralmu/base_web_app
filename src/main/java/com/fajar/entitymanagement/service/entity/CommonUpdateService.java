@@ -22,9 +22,9 @@ public class CommonUpdateService extends BaseEntityUpdateService<BaseEntity> {
 		log.info("saving entity: {}", entity.getClass());
 		entity = copyNewElement(entity, newRecord);
 
-		EntityUpdateInterceptor<BaseEntity> updateInterceptor = entity.getUpdateInterceptor();
+		
 		validateEntityFields(entity, newRecord);
-		interceptPreUpdate(entity, updateInterceptor);
+		interceptPreUpdate(entity);
 		BaseEntity newEntity = entityRepository.save(entity);
 
 		return WebResponse.builder().entity(newEntity).build();
@@ -36,8 +36,8 @@ public class CommonUpdateService extends BaseEntityUpdateService<BaseEntity> {
 	 * @param entity
 	 * @param updateInterceptor
 	 */
-	private void interceptPreUpdate(BaseEntity entity, EntityUpdateInterceptor<BaseEntity> updateInterceptor) {
-
+	private void interceptPreUpdate(BaseEntity entity ) {
+		EntityUpdateInterceptor<BaseEntity> updateInterceptor = entity.getUpdateInterceptor();
 		if (null != updateInterceptor && null != entity) {
 			log.info("Pre Update {}", entity.getClass().getSimpleName());
 			try {

@@ -10,6 +10,7 @@ import com.fajar.entitymanagement.annotation.FormField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Dto
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "user_role")
 @Builder
 @Data
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRole extends BaseEntity {

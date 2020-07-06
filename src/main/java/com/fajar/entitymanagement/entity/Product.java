@@ -1,8 +1,5 @@
 package com.fajar.entitymanagement.entity;
 
-import java.util.List;
-import java.util.function.Supplier;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -21,12 +18,14 @@ import com.fajar.entitymanagement.service.entity.ProductUpdateService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Dto(formInputColumn = FormInputColumn.ONE_COLUMN, updateService =  ProductUpdateService.class)
 @Entity
 @Table(name = "product")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -66,12 +65,6 @@ public class Product extends BaseEntity {
 	@ManyToOne
 	@FormField(optionItemName = "name", type = FieldType.FIELD_TYPE_DYNAMIC_LIST)
 	private ProductCategory category;
-
-	@Transient
-	private boolean newProduct;
-	@Transient
-	private int count;
-	@Transient
-	private List<Supplier> suppliers;
+ 
 
 }

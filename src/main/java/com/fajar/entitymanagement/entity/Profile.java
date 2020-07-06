@@ -14,12 +14,14 @@ import com.fajar.entitymanagement.service.entity.ProfileUpdateService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Dto(ignoreBaseField = false, updateService = ProfileUpdateService.class)
 @Entity
 @Table(name = "app_profile")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

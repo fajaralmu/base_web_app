@@ -11,11 +11,13 @@ import com.fajar.entitymanagement.dto.FieldType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 @Dto
 @Entity
 @Table (name="product_category")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Builder	
 @AllArgsConstructor
 @NoArgsConstructor
