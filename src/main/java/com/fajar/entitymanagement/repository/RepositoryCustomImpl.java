@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RepositoryCustomImpl implements RepositoryCustom {
 
 	@PersistenceContext
-	private EntityManager entityManager; 
+	private EntityManager entityManager;
 	@Autowired
 	private Session hibernateSession;
 
@@ -126,14 +126,13 @@ public class RepositoryCustomImpl implements RepositoryCustom {
 
 			if (field != null && propertyValue != null) {
 				final Class<?> fieldType = field.getType();
+				log.info("Type: {} : {}", fieldType, propertyValue);
+
 				if (fieldType.equals(Integer.class) || fieldType.equals(int.class)) {
-					log.info("type integer ==========================> : {}", propertyValue);
 					propertyValue = Integer.parseInt(propertyValue.toString());
 				} else if (field.getType().equals(Long.class) || fieldType.equals(long.class)) {
-					log.info("type long ==========================> : {}", propertyValue);
 					propertyValue = Long.parseLong(propertyValue.toString());
 				} else if (field.getType().equals(Double.class) || fieldType.equals(double.class)) {
-					log.info("type double ==========================> : {}", propertyValue);
 					propertyValue = Double.parseDouble(propertyValue.toString());
 				}
 
