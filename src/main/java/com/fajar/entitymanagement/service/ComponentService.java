@@ -46,7 +46,7 @@ public class ComponentService {
 		boolean hasSession = userSessionService.hasSession(request);
 
 		if (hasSession)
-			return pageRepository.findAll();
+			return pageRepository.findByOrderBySequenceAsc();
 		else
 			return pageRepository.findByAuthorized(0);
 	}

@@ -47,6 +47,17 @@ public class MvcAdminController extends BaseController {
 		model.addAttribute("page", "dashboard"); 
 		return basePage;
 	}
+	
+	@RequestMapping(value = { "/pagesequencesetting" })
+	@CustomRequestInfo(title = "Menu Sequence", pageUrl = "webpage/page-sequence", stylePaths = { "pagesequence" })
+	public String pageSequenceSetting(Model model, HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
+
+		model.addAttribute("pages", componentService.getAllPages());
+
+		return basePage;
+
+	}
 
 	 
 }

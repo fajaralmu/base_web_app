@@ -15,4 +15,6 @@ public interface PageRepository extends JpaRepository<Page, Long> {
 //	@Query(nativeQuery = true, value="select * from page where link = ?1 limit 1")
 	Page findTop1ByLink(String link);
 
+	List<Page> findByOrderBySequenceAsc();
+
 }

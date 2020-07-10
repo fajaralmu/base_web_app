@@ -1,0 +1,15 @@
+.page-item {
+	width: 100%;
+	height: 50px;
+	border: solid 2px maroon;
+	padding: 10px;
+}
+
+.page-item:hover {
+	background-color: lime;
+	cursor: pointer;
+}
+
+.page-selected {
+	background-color: lime;
+}

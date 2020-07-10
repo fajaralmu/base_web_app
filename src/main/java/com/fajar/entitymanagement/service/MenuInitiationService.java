@@ -81,12 +81,12 @@ public class MenuInitiationService {
 
 		Menu managementMenu = getMenuByCode(entityClass.getSimpleName().toLowerCase());
 		if (null == managementMenu) {
-			addNewMenuPage(entityClass);
+			addNewManagementMenuPageFor(entityClass);
 		}
 
 	}
 
-	private void addNewMenuPage(Class entityClass) {
+	private void addNewManagementMenuPageFor(Class entityClass) {
 		log.info("Will add default menu for: {}", entityClass.getSimpleName());
 		
 		Dto dto = EntityUtil.getClassAnnotation(entityClass, Dto.class);
