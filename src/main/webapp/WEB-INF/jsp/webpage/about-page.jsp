@@ -16,7 +16,7 @@
 
 
 				<div>Code</div>
-				<div>${profile.martCode }</div>
+				<div>${profile.appCode }</div>
 
 
 				<div>About</div>

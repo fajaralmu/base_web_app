@@ -31,32 +31,18 @@ public class MvcPublicController extends BaseController {
 	}
 
 	@RequestMapping(value = { "/", "index" })
-	@CustomRequestInfo(title = "Shopping Mart Application", pageUrl = "index")
+	@CustomRequestInfo(title = "Base Web Application", pageUrl = "index")
 	public String index(Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		model.addAttribute("page", "main");
 
 		return basePage;
 
-	}
-
-	@RequestMapping(value = { "/public/catalog", "/public/catalog/", "/public/catalog/{option}" })
-	@CustomRequestInfo(title = "Product Catalog", pageUrl = "webpage/catalog-page")
-	public String catalog(@PathVariable(required = false) String option, Model model, HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-
-		model.addAttribute("page", "main");
-		model.addAttribute("categories", componentService.getAllCategories());
-		model.addAttribute("defaultOption", option == null || option.equals("") ? null : option);
-		return basePage;
-
-	}
+	} 
 
 	@RequestMapping(value = { "/public/about" })
 	@CustomRequestInfo(title = "About Us", pageUrl = "webpage/about-page")
 	public String about(Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-		setActivePage(request);
 
 		model.addAttribute("page", "about");
 		return basePage;

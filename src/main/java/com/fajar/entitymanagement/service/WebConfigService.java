@@ -51,6 +51,7 @@ public class WebConfigService {
 	public static final String MENU = "menu";
 	public static final String PAGE = "page";
 	public static final String ADMIN = "admin";
+	public static final String ABOUT = "about";
 
 	@Autowired
 	private AppProfileRepository ProfileRepository;
@@ -75,7 +76,7 @@ public class WebConfigService {
 	private String DEFAULT_USER_PWD;
 	
 	private Menu defaultMenuManagementMenu, defaultPageManagementMenu;
-	private Page defaultSettingPage, defaultManagementPage, defaultAdminPage;
+	private Page defaultSettingPage, defaultManagementPage, defaultAdminPage, defaultAboutPage;
 	private User defaultUser;
 	private UserRole defaultUserRole;
 	private Profile defaultProfile;
@@ -95,7 +96,17 @@ public class WebConfigService {
 		getJpaReporitoriesBean();
 		checkUser();
 		checkDefaultProfile();
+		checkDefaultPages();
+	}
+
+	private void checkDefaultPages() {
+		 
 		defaultAdminPage();
+		defaultAboutPage();
+	}
+
+	private Page defaultAboutPage() {
+		return getPage(ABOUT, defaultAboutPage);
 	}
 
 	private void checkUser() {

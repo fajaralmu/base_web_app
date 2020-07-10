@@ -87,6 +87,17 @@
 		<property name="Authorized" value="1"></property>
 
 	</bean>
+	
+	<bean id="config_defaultAboutPage"
+		class="com.fajar.entitymanagement.entity.Page">
+		<property name="code" value="about"></property>
+		<property name="name" value="About Us"></property>
+		<property name="description" value="[Generated] About Us"></property>
+		<property name="link" value="/public/about"></property>
+		<property name="nonMenuPage" value="1"></property>
+		<property name="Authorized" value="0"></property>
+
+	</bean>
 
 	<bean id="config_defaultUser"
 		class="com.fajar.entitymanagement.entity.User">
@@ -140,6 +151,7 @@
 		<property name="defaultUserRole" ref="config_defaultUserRole"></property>
 		<property name="defaultProfile" ref="config_defaultProfile"></property>
 		<property name="defaultManagementPage" ref="config_defaultManagementPage"></property>
+		<property name="defaultAboutPage" ref="config_defaultAboutPage"></property>
 	</bean>
 
 </beans>
