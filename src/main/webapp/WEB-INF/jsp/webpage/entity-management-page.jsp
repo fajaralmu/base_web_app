@@ -53,8 +53,10 @@
 	<div class="input-group mb-3"  style="width:30%">
 		<input class="form-control" value="Page" disabled="disabled">
 		<input class="form-control" type="number" value="1" id="input-page"   />
-		<button class="btn btn-primary" id="btn-filter-ok" onclick="setPage()">Ok</button>
-		<button class="btn btn-secondary" id="btn-filter-ok" onclick="printExcel()">Print Excel</button>
+		<div class="input-group-append">
+			<button class="btn btn-primary" id="btn-filter-ok" onclick="setPage()">Ok</button>
+			<button class="btn btn-secondary" id="btn-printExcel" onclick="printExcel()">Print Excel</button>
+		</div>
 
 	</div>
 	<nav>
