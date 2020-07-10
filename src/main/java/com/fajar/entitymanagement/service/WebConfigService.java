@@ -197,8 +197,8 @@ public class WebConfigService {
 
 		menuRepository.save(menu);
 	}
-
-	private Page defaultSettingPage() {
+	 
+	public Page defaultSettingPage() {
 		Page menuPage = pageRepository.findByCode(SETTING);
 		if (null != menuPage) {
 			log.info("defaultPage FOUND!");
