@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.fajar.entitymanagement.annotation.Authenticated;
 import com.fajar.entitymanagement.annotation.CustomRequestInfo;
 import com.fajar.entitymanagement.service.LogProxyFactory;
+import com.fajar.entitymanagement.util.SessionUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +45,8 @@ public class MvcAdminController extends BaseController {
 
 //		model.addAttribute("menus", componentService.getDashboardMenus(request));
 		model.addAttribute("imagePath", webAppConfiguration.getUploadedImagePath());
-		model.addAttribute("page", "dashboard"); 
+		model.addAttribute("page", "admin"); 
+		setActivePage(request, "admin");
 		return basePage;
 	}
 	
@@ -54,7 +56,7 @@ public class MvcAdminController extends BaseController {
 			throws IOException {
 
 		model.addAttribute("pages", componentService.getAllPages());
-
+		setActivePage(request, "admin");
 		return basePage;
 
 	}

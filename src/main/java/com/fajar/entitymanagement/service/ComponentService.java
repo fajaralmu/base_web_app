@@ -39,7 +39,7 @@ public class ComponentService {
 	@Autowired
 	private PageRepository pageRepository; 
 	@Autowired
-	private MenuRepository menuRepository;
+	private MenuRepository menuRepository; 
 	 
 	public List<Page> getPages(HttpServletRequest request) {
 
@@ -160,6 +160,6 @@ public class ComponentService {
 			page.setSequence(sequence);
 			entityRepository.save(page);
 		}
-	}
+	} 
 
 }

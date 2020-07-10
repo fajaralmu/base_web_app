@@ -34,7 +34,7 @@
 	</bean>
 
 
-	<bean id="config_defaultMenu"
+	<bean id="config_defaultManagementMenu"
 		class="com.fajar.entitymanagement.entity.Menu">
 		<property name="code" value="menu"></property>
 		<property name="name" value="Menu Management"></property>
@@ -72,6 +72,17 @@
 		<property name="name" value="Management"></property>
 		<property name="description" value="[Generated] Management Page"></property>
 		<property name="link" value="/webpage/page/management"></property>
+		<property name="nonMenuPage" value="0"></property>
+		<property name="Authorized" value="1"></property>
+
+	</bean>
+	
+	<bean id="config_defaultAdminPage"
+		class="com.fajar.entitymanagement.entity.Page">
+		<property name="code" value="admin"></property>
+		<property name="name" value="Admin"></property>
+		<property name="description" value="[Generated] Admin Page"></property>
+		<property name="link" value="/webpage/page/admin"></property>
 		<property name="nonMenuPage" value="0"></property>
 		<property name="Authorized" value="1"></property>
 
@@ -120,7 +131,8 @@
 			value="WebAsset/Shop1/Images"></property>
 		<property name="reportPath"
 			value="D:/Development/Files/Web/Shop1/Reports"></property>
-		<property name="defaultMenu" ref="config_defaultMenu"></property>
+		<property name="defaultMenuManagementMenu" ref="config_defaultManagementMenu"></property>
+		<property name="defaultAdminPage" ref="config_defaultAdminPage"></property>
 		<property name="defaultPageManagementMenu"
 			ref="config_defaultPageManagementMenu"></property>
 		<property name="defaultSettingPage" ref="config_defaultSettingPage"></property>

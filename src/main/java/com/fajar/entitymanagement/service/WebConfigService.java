@@ -50,6 +50,7 @@ public class WebConfigService {
 	public static final String SETTING = "setting";
 	public static final String MENU = "menu";
 	public static final String PAGE = "page";
+	public static final String ADMIN = "admin";
 
 	@Autowired
 	private AppProfileRepository ProfileRepository;
@@ -73,8 +74,8 @@ public class WebConfigService {
 	private String DEFAULT_USER_NAME;
 	private String DEFAULT_USER_PWD;
 	
-	private Menu defaultMenu, defaultPageManagementMenu;
-	private Page defaultSettingPage, defaultManagementPage;
+	private Menu defaultMenuManagementMenu, defaultPageManagementMenu;
+	private Page defaultSettingPage, defaultManagementPage, defaultAdminPage;
 	private User defaultUser;
 	private UserRole defaultUserRole;
 	private Profile defaultProfile;
@@ -83,17 +84,18 @@ public class WebConfigService {
 	private List<JpaRepository<?, ?>> jpaRepositories = new ArrayList<>();
 	private List<Type> entityClassess = new ArrayList<>();
 	private Map<Class<? extends BaseEntity>, JpaRepository> repositoryMap = new HashMap<>();
-
 	
 	
 	@PostConstruct
 	public void init() {
-		log.info("DEFAULT_USER_NAME: {}", DEFAULT_USER_NAME);
+		log.info("WebConfigService INITIALIZE");
+		
 		LogProxyFactory.setLoggers(this);
 		
 		getJpaReporitoriesBean();
 		checkUser();
 		checkDefaultProfile();
+		defaultAdminPage();
 	}
 
 	private void checkUser() {
@@ -164,52 +166,48 @@ public class WebConfigService {
 		return checkDefaultProfile();
 	}
 	
-	public Menu checkDefaultMenu() {
-		checkPageManagementMenu();
-		Menu menu = menuRepository.findByCode(MENU);
+	public Menu getMenu(String code, Menu defaultMenuIfNotExist, Page menuPage) {
+		Page eixsitingPage = getPage(menuPage.getCode(), menuPage);
+		Menu menu = menuRepository.findByCode(code);
 		if (null != menu) {
-			log.info("defaultMenu FOUND!");
+			log.info("menu: {} FOUND!", code);
 			return menu;
 		}
 
-		log.info("WILL SAVE defaultMenu...");
+		log.info("WILL SAVE menu with :{}", code);
 
-		menu = defaultMenu;
-		Page menuPage = defaultSettingPage();
-		menu.setMenuPage(menuPage); 
+		menu = defaultMenuIfNotExist; 
+		menu.setMenuPage(eixsitingPage); 
 
 		return menuRepository.save(menu);
 	}
-
-	public void checkPageManagementMenu() {
-		Menu menu = menuRepository.findByCode(PAGE);
-		if (null != menu) {
-			log.info("Page Management Menu FOUND!");
-			return;
-		}
-
-		log.info("WILL Add Page Management Menu...");
-
-		menu = defaultPageManagementMenu;
 	
-		Page menuPage = defaultSettingPage();
-		menu.setMenuPage(menuPage);
+	public Menu checkDefaultMenu() {
+		return getMenu(MENU, defaultMenuManagementMenu, defaultSettingPage());
+	}
 
-		menuRepository.save(menu);
+	public Menu checkPageManagementMenu() {
+		return getMenu(PAGE, defaultPageManagementMenu, defaultSettingPage());
+	}
+	
+	private Page getPage(String code, Page defaultPageIfNotExist) {
+		Page page = pageRepository.findByCode(code);
+		if (null != page) {
+			log.info("page with code: {} FOUND!", code);
+			return page;
+		}
+		log.info("WILL SAVE page : {}...", code);
+		return pageRepository.save(defaultPageIfNotExist);
 	}
 	 
+	public Page defaultAdminPage() {
+		return getPage(ADMIN, defaultAdminPage);
+	}
+	
 	public Page defaultSettingPage() {
-		Page menuPage = pageRepository.findByCode(SETTING);
-		if (null != menuPage) {
-			log.info("defaultPage FOUND!");
-			return menuPage;
-		}
-
-		log.info("WILL SAVE SETTING defaultPage...");
-
-		menuPage = defaultSettingPage; 
-
-		return pageRepository.save(menuPage);
+		
+		return getPage(SETTING, defaultSettingPage);
+		 
 	}
 
 	public static void main(String[] args) throws IOException {

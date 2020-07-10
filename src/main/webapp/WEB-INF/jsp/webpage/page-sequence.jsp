@@ -3,12 +3,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
- 
+
 <div class="content" style="width: 100%">
 
 	<div id="content-report">
 		<h2>Report Page</h2>
-		<p>Good ${timeGreeting}, ${loggedUser.displayName}. Please set the menu display order</p>
+		<p>Good ${timeGreeting}, ${loggedUser.displayName}. Please set the
+			menu display order</p>
 
 
 		<div style="display: grid; grid-template-columns: 70% 20%;">
@@ -20,12 +21,18 @@
 		</div>
 		<button class="btn btn-success" onclick="save()">Save</button>
 	</div>
+	<div class="menu-and-page-setting">
+		<h4>Menu And Page Setting</h4>
+		<a id="btn-reset-all-menus" class="btn btn-danger"
+			href="<spring:url value="/account/websetting?action=resetmenu"></spring:url>">Reset All Menus</a>
+	</div>
 </div>
 <script type="text/javascript">
 	var contentItems;
 	var selectedId = 0;
 	var pagesContainer = document.getElementById("pages");
 	var pages = {};
+	const btnResetMenus = _byId("btn-reset-all-menus");
 
 	function initEvents() {
 		contentItems = document.getElementsByClassName("page-item");
@@ -34,6 +41,16 @@
 			contentItem.onclick = function(e) {
 
 				contentItemOnClick(contentItem);
+			}
+		}
+		
+		btnResetMenusOnClick();
+	}
+	
+	function btnResetMenusOnClick(){
+		btnResetMenus.onclick = function(e){
+			if(!confirm("Are you sure want to reset all pages and menus?")){
+				e.preventDefault();
 			}
 		}
 	}
@@ -59,12 +76,12 @@
 			className = "page-item page-selected";
 		}
 
-		const div = createHtmlTag( {
-			'tagName': "div",
+		const div = createHtmlTag({
+			'tagName' : "div",
 			"id" : entity.id,
 			"class" : className,
 			"child" : createHtmlTag({
-				'tagName': "h3", 
+				'tagName' : "h3",
 				"innerHTML" : entity.name
 			})
 		});
@@ -146,8 +163,8 @@
 			"filter" : {
 				"limit" : 0,
 				"page" : 0,
-				"orderBy":"sequence",
-				"orderType":"asc"
+				"orderBy" : "sequence",
+				"orderType" : "asc"
 			}
 		};
 
@@ -177,12 +194,12 @@
 				function(xhr) {
 					var response = xhr.data;
 					console.log("RESPONSE: ", response)
-					if(response.code == "00"){
+					if (response.code == "00") {
 						alert("DONE..");
-					}else{
-						alert("Error: "+response.message+response.code);
+					} else {
+						alert("Error: " + response.message + response.code);
 					}
-					 
+
 					infoDone();
 				});
 	}

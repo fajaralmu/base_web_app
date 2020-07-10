@@ -42,6 +42,7 @@ public class MenuInitiationService {
 	@PostConstruct
 	public void init() {
 
+		log.info("MenuInitiationService INITIALIZE");
 		try {
 			checkDefaultMenu();
 			checkManagementPage();
@@ -92,7 +93,7 @@ public class MenuInitiationService {
 		adminMenu.setDescription(StringUtil.extractCamelCase(method.getName()));
 		adminMenu.setName(StringUtil.extractCamelCase(method.getName()));
 		adminMenu.setUrl("/"+baseMapping+"/" + requestMapping.value()[0]);
-		adminMenu.setMenuPage(webConfigService.defaultSettingPage());
+		adminMenu.setMenuPage(webConfigService.defaultAdminPage());
 
 		return adminMenu;
 	}
@@ -148,18 +149,19 @@ public class MenuInitiationService {
 
 		Menu menu = new Menu();
 		menu.setCode(menuCode);
-		menu.setName(StringUtil.extractCamelCase(entityClass.getSimpleName()) + " Management");
-		if (commonPage) {
-			menu.setUrl("/management/common/" + menuCode);
-		} else {
-			menu.setUrl("/management/" + menuCode);
-		}
+		menu.setName(StringUtil.extractCamelCase(entityClass.getSimpleName()) + " Management"); 
 		Page menuPage = getPageByCode(MANAGEMENT);
 		menu.setMenuPage(menuPage);
 		menu.setColor("#ffffff");
 		menu.setFontColor("#000000");
 		menu.setDescription("Generated Management Page For: " + entityClass.getSimpleName());
-
+		
+		if (commonPage) {
+			menu.setUrl("/management/common/" + menuCode);
+		} else {
+			menu.setUrl("/management/" + menuCode);
+		}
+		
 		MenuRepository.save(menu);
 
 		log.info("Success Adding Management Menu For: {}", menuCode);
@@ -175,6 +177,19 @@ public class MenuInitiationService {
 
 	private Page getPageByCode(String code) {
 		return PageRepository.findByCode(code);
+	}
+
+	public void resetMenus() {
+
+		log.info("Will reset menus");
+		MenuRepository.deleteAll();
+		log.info("ALl menus have been deleted");
+		PageRepository.deleteAll();
+		log.info("All pages have been deleted");
+		
+		webConfigService.init();
+		this.init();
+		
 	}
 
 }
