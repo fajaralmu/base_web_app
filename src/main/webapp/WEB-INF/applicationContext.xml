@@ -11,8 +11,6 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 
-
-
 	<!-- <bean id="urlPathHelper" class="org.springframework.beans.factory.config.MethodInvokingBean"> 
 		<property name="targetClass" value="org.springframework.web.util.UrlPathHelper" 
 		/> <property name="targetMethod" value="setRemoveSemicolonContent" /> <property 
@@ -23,6 +21,101 @@
 		<property name="targetClass" value="org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer" 
 		/> <property name="targetMethod" value="enable" /> </bean> -->
 
+	<!-- web app custom config -->
+	<bean id="DEFAULT_USER_NAME" class="java.lang.String">
+		<constructor-arg value="admin" />
+	</bean>
+	<bean id="DEFAULT_USER_PWD" class="java.lang.String">
+		<constructor-arg value="123" />
 
+	</bean>
+	<bean id="APP_CODE" class="java.lang.String">
+		<constructor-arg value="MY_APP"></constructor-arg>
+	</bean>
+
+
+	<bean id="config_defaultMenu"
+		class="com.fajar.entitymanagement.entity.Menu">
+		<property name="code" value="menu"></property>
+		<property name="name" value="Menu Management"></property>
+		<property name="url" value="/management/common/menu"></property>
+		<property name="color" value="#ffffff"></property>
+		<property name="fontColor" value="#000000"></property>
+		<property name="Description"
+			value="[Generated] Menu Management"></property>
+
+	</bean>
+	<bean id="config_defaultPageManagementMenu"
+		class="com.fajar.entitymanagement.entity.Menu">
+		<property name="code" value="page"></property>
+		<property name="name" value="Page Management"></property>
+		<property name="url" value="/management/common/page"></property>
+		<property name="color" value="#ffffff"></property>
+		<property name="fontColor" value="#000000"></property>
+		<property name="Description"
+			value="[Generated] Page Management"></property>
+	</bean>
+
+	<bean id="config_defaultMenuPage"
+		class="com.fajar.entitymanagement.entity.Page">
+		<property name="code" value="setting"></property>
+		<property name="name" value="Setting"></property>
+		<property name="description" value="[Generated] Setting Page"></property>
+		<property name="link" value="/webpage/page/setting"></property>
+		<property name="nonMenuPage" value="0"></property>
+		<property name="Authorized" value="1"></property>
+
+	</bean>
+
+	<bean id="config_defaultUser"
+		class="com.fajar.entitymanagement.entity.User">
+		<property name="username" ref="DEFAULT_USER_NAME"></property>
+		<property name="password" ref="DEFAULT_USER_PWD"></property>
+		<property name="displayName" value="Default User"></property>
+	</bean>
+
+	<bean id="config_defaultUserRole"
+		class="com.fajar.entitymanagement.entity.UserRole">
+		<property name="code" value="00"></property>
+		<property name="name" value="Default Role"></property>
+		<property name="access" value="00"></property>
+	</bean>
+
+	<bean id="config_defaultProfile"
+		class="com.fajar.entitymanagement.entity.Profile">
+		<property name="name" value="My Entity Management App"></property>
+		<property name="address"
+			value="Spring Mvc, Java Virtual Machine, Win 10 64"></property>
+		<property name="contact" value="087737666614"></property>
+		<property name="website"
+			value="http://localhost:8080/entitymanagement"></property>
+		<property name="iconUrl" value="DefaultIcon.BMP"></property>
+		<property name="backgroundUrl" value="DefaultBackground.BMP"></property>
+		<property name="appCode" ref="APP_CODE"></property>
+		<property name="shortDescription" value="Base Web App"></property>
+		<property name="color" value="green"></property>
+		<property name="about" value="Generated Profile"></property>
+	</bean>
+
+	<bean id="webAppConfig"
+		class="com.fajar.entitymanagement.service.WebConfigService">
+		<property name="basePage" value="BASE_PAGE"></property>
+		<property name="appCode" ref="APP_CODE"></property>
+		<property name="DEFAULT_USER_NAME" ref="DEFAULT_USER_NAME"></property>
+		<property name="DEFAULT_USER_PWD" ref="DEFAULT_USER_PWD"></property>
+
+		<property name="uploadedImageRealPath"
+			value="D:/Development/Files/Web/Shop1/Images"></property>
+		<property name="uploadedImagePath"
+			value="WebAsset/Shop1/Images"></property>
+		<property name="reportPath"
+			value="D:/Development/Files/Web/Shop1/Reports"></property>
+		<property name="defaultMenu" ref="config_defaultMenu"></property>
+		<property name="defaultPageManagementMenu"
+			ref="config_defaultPageManagementMenu"></property>
+		<property name="defaultMenuPage" ref="config_defaultMenuPage"></property>
+		<property name="defaultUser" ref="config_defaultUser"></property>
+		<property name="defaultUserRole" ref="config_defaultUserRole"></property>
+	</bean>
 
 </beans>

@@ -2,6 +2,7 @@ package com.fajar.entitymanagement.repository;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -219,8 +220,10 @@ public class RepositoryCustomImpl implements RepositoryCustom {
 
 		if (null == rawEntity) {
 			log.error("rawEntity IS NULL");
+			return null;
 		}
-
+ 
+		
 		PersistenceOperation<T> persistenceOperation = new PersistenceOperation<T>() {
 
 			@Override
@@ -235,6 +238,8 @@ public class RepositoryCustomImpl implements RepositoryCustom {
 
 				if (entity.getId() == null) {
 					log.debug("Will save new entity ");
+					rawEntity.setCreatedDate(new Date());
+					
 					Long newId = (Long) hibernateSession.save(entity);
 					result = entity;
 					result.setId(newId);
@@ -242,6 +247,8 @@ public class RepositoryCustomImpl implements RepositoryCustom {
 					log.debug("success add new record of {} with new ID: {}", entity.getClass(), newId);
 				} else {
 					log.debug("Will update entity ");
+					entity.setModifiedDate(new Date());
+					
 					result = (T) hibernateSession.merge(entity);
 
 					log.debug("success update record of {}", entity.getClass());

@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,23 +72,28 @@ public class WebConfigService {
 	private String appCode;
 	private String DEFAULT_USER_NAME;
 	private String DEFAULT_USER_PWD;
-//	private Menu defaultMenu;
-//	private Page defaultMenuPage;
+	
+	private Menu defaultMenu, defaultPageManagementMenu;
+	private Page defaultMenuPage;
+	private User defaultUser;
+	private UserRole defaultUserRole;
+	private Profile defaultProfile;
 	/////////////////////////////////////////////////////////////
 
 	private List<JpaRepository<?, ?>> jpaRepositories = new ArrayList<>();
 	private List<Type> entityClassess = new ArrayList<>();
 	private Map<Class<? extends BaseEntity>, JpaRepository> repositoryMap = new HashMap<>();
 
+	
+	
 	@PostConstruct
 	public void init() {
+		log.info("DEFAULT_USER_NAME: {}", DEFAULT_USER_NAME);
 		LogProxyFactory.setLoggers(this);
-		Profile dbProfile = ProfileRepository.findByAppCode(appCode);
-		if (null == dbProfile) {
-			ProfileRepository.save(defaultProfile());
-		}
+		
 		getJpaReporitoriesBean();
 		checkUser();
+		checkDefaultProfile();
 	}
 
 	private void checkUser() {
@@ -108,12 +112,9 @@ public class WebConfigService {
 		if (null != user) {
 			return user;
 		}
-		user = new User();
-		user.setUsername(DEFAULT_USER_NAME);
-		user.setPassword(DEFAULT_USER_PWD);
-		user.setRole(defaultRole());
-		user.setDisplayName("DEFAULT USER");
-
+		user = defaultUser;
+		user.setRole(defaultRole());  
+		
 		return userRepository.save(user);
 	}
 
@@ -122,10 +123,7 @@ public class WebConfigService {
 		if (null != userRole) {
 			return userRole;
 		}
-		userRole = new UserRole();
-		userRole.setCode(DEFAULT_ROLE);
-		userRole.setName("Default Role");
-		userRole.setAccess(DEFAULT_ROLE);
+		userRole = defaultUserRole;
 
 		return userRoleRepository.save(userRole);
 	}
@@ -164,7 +162,6 @@ public class WebConfigService {
 
 	public Menu checkDefaultMenu() {
 		checkPageManagementMenu();
-
 		Menu menu = menuRepository.findByCode(MENU);
 		if (null != menu) {
 			log.info("defaultMenu FOUND!");
@@ -173,15 +170,9 @@ public class WebConfigService {
 
 		log.info("WILL SAVE defaultMenu...");
 
-		menu = new Menu();
-		menu.setCode(MENU);
-		menu.setName("Menu Management");
-		menu.setUrl("/management/common/menu");
-		Page menuPage = defaultPage();
-		menu.setMenuPage(menuPage);
-		menu.setColor("#ffffff");
-		menu.setFontColor("#000000");
-		menu.setDescription("Default " + MENU + " Page");
+		menu = defaultMenu;
+		Page menuPage = defaultSettingPage();
+		menu.setMenuPage(menuPage); 
 
 		return menuRepository.save(menu);
 	}
@@ -195,37 +186,24 @@ public class WebConfigService {
 
 		log.info("WILL Add Page Management Menu...");
 
-		menu = new Menu();
-		menu.setCode(PAGE);
-		menu.setName("Page Management");
-		menu.setUrl("/management/common/page");
-		Page menuPage = defaultPage();
+		menu = defaultPageManagementMenu;
+	
+		Page menuPage = defaultSettingPage();
 		menu.setMenuPage(menuPage);
-		menu.setColor("#ffffff");
-		menu.setFontColor("#000000");
-		menu.setDescription("Generated Page Management");
 
 		menuRepository.save(menu);
 	}
 
-	private Page defaultPage() {
+	private Page defaultSettingPage() {
 		Page menuPage = pageRepository.findByCode(SETTING);
 		if (null != menuPage) {
 			log.info("defaultPage FOUND!");
 			return menuPage;
 		}
 
-		log.info("WILL SAVE defaultPage...");
+		log.info("WILL SAVE SETTING defaultPage...");
 
-		menuPage = new Page();
-		menuPage.setCode(SETTING);
-		menuPage.setCreatedDate(new Date());
-		menuPage.setDescription("Default Setting Page");
-		menuPage.setLink("/webpage/page/" + SETTING);
-		menuPage.setName(SETTING);
-		menuPage.setNonMenuPage(0);
-		menuPage.setAuthorized(1);
-		menuPage.setSequence(0);
+		menuPage = defaultMenuPage; 
 
 		return pageRepository.save(menuPage);
 	}
@@ -299,26 +277,16 @@ public class WebConfigService {
 		}
 	}
 
-	public Profile getProfile() {
+	public Profile checkDefaultProfile() {
 		Profile dbProfile = ProfileRepository.findByAppCode(appCode);
+		if (null == dbProfile) {
+			ProfileRepository.save(defaultProfile);
+		}
+		dbProfile = ProfileRepository.findByAppCode(appCode);
 
 		/* return getProfileFromSession(); */ return EntityUtil.validateDefaultValue(dbProfile);
 	}
-
-	private Profile defaultProfile() {
-		Profile profile = new Profile();
-		profile.setName("My Entity Management App");
-		profile.setAddress("Spring Mvc, Java Virtual Machine, Win 10 64");
-		profile.setContact("087737666614");
-		profile.setWebsite("http://localhost:8080/entitymanagement");
-		profile.setIconUrl("DefaultIcon.BMP");
-		profile.setBackgroundUrl("DefaultBackground.BMP");
-		profile.setAppCode(appCode);
-		profile.setShortDescription("Entity Management");
-		profile.setColor("green");
-		profile.setAbout("Nam libero tempore.");
-		return profile;
-	}
+ 
 
 	public <T extends BaseEntity> JpaRepository getJpaRepository(Class<T> _entityClass) {
 		log.info("get JPA Repository for: {}", _entityClass);

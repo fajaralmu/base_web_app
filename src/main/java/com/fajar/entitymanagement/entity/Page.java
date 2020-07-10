@@ -56,6 +56,8 @@ public class Page extends BaseEntity  {/**
 	@FormField(type=FieldType.FIELD_TYPE_NUMBER,lableName = "Urutan Ke")
 	private int sequence;
 	
+
+	
 	@Transient
 	private List<Menu> menus;
 	public String isMenuPage() {
