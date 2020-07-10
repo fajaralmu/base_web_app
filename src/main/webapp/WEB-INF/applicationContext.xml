@@ -56,12 +56,22 @@
 			value="[Generated] Page Management"></property>
 	</bean>
 
-	<bean id="config_defaultMenuPage"
+	<bean id="config_defaultSettingPage"
 		class="com.fajar.entitymanagement.entity.Page">
 		<property name="code" value="setting"></property>
 		<property name="name" value="Setting"></property>
 		<property name="description" value="[Generated] Setting Page"></property>
 		<property name="link" value="/webpage/page/setting"></property>
+		<property name="nonMenuPage" value="0"></property>
+		<property name="Authorized" value="1"></property>
+
+	</bean>
+	<bean id="config_defaultManagementPage"
+		class="com.fajar.entitymanagement.entity.Page">
+		<property name="code" value="management"></property>
+		<property name="name" value="Management"></property>
+		<property name="description" value="[Generated] Management Page"></property>
+		<property name="link" value="/webpage/page/management"></property>
 		<property name="nonMenuPage" value="0"></property>
 		<property name="Authorized" value="1"></property>
 
@@ -113,10 +123,11 @@
 		<property name="defaultMenu" ref="config_defaultMenu"></property>
 		<property name="defaultPageManagementMenu"
 			ref="config_defaultPageManagementMenu"></property>
-		<property name="defaultMenuPage" ref="config_defaultMenuPage"></property>
+		<property name="defaultSettingPage" ref="config_defaultSettingPage"></property>
 		<property name="defaultUser" ref="config_defaultUser"></property>
 		<property name="defaultUserRole" ref="config_defaultUserRole"></property>
 		<property name="defaultProfile" ref="config_defaultProfile"></property>
+		<property name="defaultManagementPage" ref="config_defaultManagementPage"></property>
 	</bean>
 
 </beans>

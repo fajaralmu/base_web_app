@@ -1,7 +1,6 @@
 package com.fajar.entitymanagement.service;
 
 import java.lang.reflect.Type;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -31,7 +30,7 @@ public class MenuInitiationService {
 	private List<Type> persistenceEntities;
 
 	@Autowired
-	private MenuRepository MenuRepository;
+	private MenuRepository MenuRepository; 
 
 	@Autowired
 	private PageRepository PageRepository;
@@ -63,16 +62,7 @@ public class MenuInitiationService {
 
 	private Page defaultManagementPage() {
 
-		Page menuPage = new Page();
-		menuPage.setCode(MANAGEMENT);
-		menuPage.setCreatedDate(new Date());
-		menuPage.setDescription("Default Management Page");
-		menuPage.setLink("/webpage/page/" + MANAGEMENT);
-		menuPage.setName(MANAGEMENT + "(generated)");
-		menuPage.setNonMenuPage(0);
-		menuPage.setAuthorized(1);
-		menuPage.setSequence(0);
-		return menuPage;
+		return webConfigService.getDefaultManagementPage();
 	}
 
 	private void getPersistenctEntities() {

@@ -74,7 +74,7 @@ public class WebConfigService {
 	private String DEFAULT_USER_PWD;
 	
 	private Menu defaultMenu, defaultPageManagementMenu;
-	private Page defaultMenuPage;
+	private Page defaultSettingPage, defaultManagementPage;
 	private User defaultUser;
 	private UserRole defaultUserRole;
 	private Profile defaultProfile;
@@ -207,7 +207,7 @@ public class WebConfigService {
 
 		log.info("WILL SAVE SETTING defaultPage...");
 
-		menuPage = defaultMenuPage; 
+		menuPage = defaultSettingPage; 
 
 		return pageRepository.save(menuPage);
 	}
