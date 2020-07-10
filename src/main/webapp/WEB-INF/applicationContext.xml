@@ -83,7 +83,7 @@
 
 	<bean id="config_defaultProfile"
 		class="com.fajar.entitymanagement.entity.Profile">
-		<property name="name" value="My Entity Management App"></property>
+		<property name="name" value="My Base Web App"></property>
 		<property name="address"
 			value="Spring Mvc, Java Virtual Machine, Win 10 64"></property>
 		<property name="contact" value="087737666614"></property>
@@ -116,6 +116,7 @@
 		<property name="defaultMenuPage" ref="config_defaultMenuPage"></property>
 		<property name="defaultUser" ref="config_defaultUser"></property>
 		<property name="defaultUserRole" ref="config_defaultUserRole"></property>
+		<property name="defaultProfile" ref="config_defaultProfile"></property>
 	</bean>
 
 </beans>

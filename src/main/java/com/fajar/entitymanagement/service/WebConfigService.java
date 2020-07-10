@@ -160,6 +160,10 @@ public class WebConfigService {
 		}
 	}
 
+	public Profile getProfile() {
+		return checkDefaultProfile();
+	}
+	
 	public Menu checkDefaultMenu() {
 		checkPageManagementMenu();
 		Menu menu = menuRepository.findByCode(MENU);
