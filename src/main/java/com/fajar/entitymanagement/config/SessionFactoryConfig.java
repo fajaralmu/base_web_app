@@ -70,7 +70,7 @@ public class SessionFactoryConfig {
 		
 		String dialect = entityManagerFactoryBean.getProperties().get("hibernate.dialect").toString();
 		String ddlAuto = entityManagerFactoryBean.getProperties().get("hibernate.hbm2ddl.auto").toString();
-		 
+		String showSql = entityManagerFactoryBean.getProperties().get("hibernate.show_sql").toString();
 		
 		Properties properties = new Properties();
 		properties.setProperty("hibernate.dialect", dialect);
@@ -80,7 +80,7 @@ public class SessionFactoryConfig {
 		
 		properties.setProperty("hibernate.connection.driver_class", com.mysql.jdbc.Driver.class.getCanonicalName());
 		properties.setProperty("hibernate.current_session_context_class", "thread");
-		properties.setProperty("hibernate.show_sql", "true");
+		properties.setProperty("hibernate.show_sql", showSql);
 		properties.setProperty("hibernate.connection.pool_size", "1");
 		properties.setProperty("hbm2ddl.auto", ddlAuto);
 		return properties;
