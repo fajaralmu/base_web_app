@@ -37,10 +37,10 @@ public class Page extends BaseEntity  {/**
 	@FormField
 	@Column(unique = true)
 	private String name;
-	@FormField(lableName = "Authorized (1 or 0)",type = FieldType.FIELD_TYPE_NUMBER)
+	@FormField(lableName = "Authorized (yes:1 or no:0)",type = FieldType.FIELD_TYPE_PLAIN_LIST, availableValues = {"0", "1"})
 	@Column(nullable = false)
 	private int authorized; 
-	@FormField(lableName = "Is nonMenu Page(1 or 0)",type = FieldType.FIELD_TYPE_NUMBER)
+	@FormField(lableName = "Is Non-Menu Page (yes:1 or no:0)",type = FieldType.FIELD_TYPE_PLAIN_LIST, availableValues = {"0", "1"})
 	@Column(name = "is_non_menu_page")
 	private int nonMenuPage;
 	@FormField(lableName = "Link for non menu page")
