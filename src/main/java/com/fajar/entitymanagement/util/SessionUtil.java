@@ -2,9 +2,11 @@ package com.fajar.entitymanagement.util;
 
 import java.util.Date;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fajar.entitymanagement.controller.BaseController;
 import com.fajar.entitymanagement.dto.WebResponse;
 import com.fajar.entitymanagement.entity.RegisteredRequest;
 import com.fajar.entitymanagement.entity.User;
@@ -65,11 +67,14 @@ public class SessionUtil {
 		httpRequest.getSession().setAttribute(ATTR_USER, dbUser);
 	}
 
-	public static void removeSessionUserAndInvalidate(HttpServletRequest request) {
-
+	public static void removeSessionUserAndInvalidate(HttpServletRequest request) { 
+		
 		request.getSession(false).removeAttribute(ATTR_USER);
 		request.getSession(false).invalidate();
-
+		
+		///////// create new session ////////////
+		request.getSession(true).setAttribute("created", new Date());
+ 
 	}
 
 	public static String getSessionRequestUri(HttpServletRequest httpRequest) {

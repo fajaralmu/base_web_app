@@ -85,14 +85,13 @@ public class MvcAccountController extends BaseController {
 
 	}
 
-	
-	@RequestMapping(value = { "/logout" }) 
+	@RequestMapping(value = { "/logout" })
 	public void logout(Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		boolean logout = userService.logout(request);
-		if(logout) {
+		if (logout) {
 			response.setStatus(301);
-			response.setHeader("location", "/account/login");
-		}else {
+			response.setHeader("location", request.getContextPath() + "/account/login");
+		} else {
 			throw new RuntimeException("Logout Failed");
 		}
 	}

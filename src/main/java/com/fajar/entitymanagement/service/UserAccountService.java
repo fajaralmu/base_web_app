@@ -3,11 +3,8 @@ package com.fajar.entitymanagement.service;
 import java.util.Optional;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -93,12 +90,9 @@ public class UserAccountService {
 			return new WebResponse("01", "invalid credential");
 		}
 
-		dbUser = userSessionService.addUserSession(dbUser, httpRequest, httpResponse);
-		WebResponse requestIdResponse = userSessionService.requestId(httpRequest, httpResponse);
-		SessionUtil.setSessionRegisteredRequestId(httpRequest, requestIdResponse);
-
-		WebResponse response = new WebResponse("00", "success");
-		response.setEntity(dbUser);
+		userSessionService.addUserSession(dbUser, httpRequest, httpResponse);
+		
+		registerRequestId(httpRequest, httpResponse); 
 
 		log.info("LOGIN SUCCESS");
 
@@ -109,9 +103,15 @@ public class UserAccountService {
  
 			httpResponse.setHeader("location", sessionRequestUri); 
 //			response.setRedirectUrl(sessionRequestUri);
-		}
-		response.setMessage(requestIdResponse.getMessage());
-		return response;
+		} 
+		return WebResponse.success();
+	}
+
+	private void registerRequestId(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+		 
+		WebResponse requestIdResponse = userSessionService.generateRequestId(httpRequest, httpResponse);
+		SessionUtil.setSessionRegisteredRequestId(httpRequest, requestIdResponse);
+
 	}
 
 	/**

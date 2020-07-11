@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fajar.entitymanagement.controller.BaseController;
 import com.fajar.entitymanagement.dto.SessionData;
 import com.fajar.entitymanagement.dto.UserSessionModel;
 import com.fajar.entitymanagement.dto.WebRequest;
@@ -44,10 +45,7 @@ public class UserSessionService {
 	private RealtimeService2 realtimeService;
 
 	@Autowired
-	private RuntimeService registryService;
-
-//	@Autowired
-//	private MessagingService messagingService;
+	private RuntimeService runtimeService; 
 
 	@PostConstruct
 	public void init() {
@@ -76,7 +74,7 @@ public class UserSessionService {
 	 */
 	public User getUserFromRegistry(HttpServletRequest request) {
 		String loginKey = SessionUtil.getLoginKey(request);
-		UserSessionModel registryModel = registryService.getModel(loginKey);
+		UserSessionModel registryModel = runtimeService.getModel(loginKey);
 
 		if (registryModel == null) {
 			return null;
@@ -86,7 +84,7 @@ public class UserSessionService {
 	}
 
 	public User getUserFromRegistry(String loginKey) {
-		UserSessionModel registryModel = registryService.getModel(loginKey);
+		UserSessionModel registryModel = runtimeService.getModel(loginKey);
 
 		if (registryModel == null) {
 			return null;
@@ -127,7 +125,7 @@ public class UserSessionService {
 		User sessionUser = SessionUtil.getSessionUser(request);
 
 		try {
-			UserSessionModel registryModel = registryService.getModel(sessionUser.getLoginKey().toString());
+			UserSessionModel registryModel = runtimeService.getModel(sessionUser.getLoginKey().toString());
 
 			if (sessionUser == null || registryModel == null || !sessionUser.equals(registryModel.getUser())) {
 				log.error("==========USER NOT EQUALS==========");
@@ -154,7 +152,7 @@ public class UserSessionService {
 			dbUser.setLoginKey(loginKey);
 			dbUser.setPassword(null);
 
-			boolean registryIsSet = registryService.set(loginKey, registryModel);
+			boolean registryIsSet = runtimeService.set(loginKey, registryModel);
 
 			if (!registryIsSet) {
 				throw new RuntimeException("Error saving session");
@@ -188,9 +186,11 @@ public class UserSessionService {
 		try {
 
 			User user = getLoggedUser(request);
-			registryService.remove(user.getLoginKey().toString());
+			runtimeService.remove(user.getLoginKey());
 			invalidateSessionUser(request);
 
+			runtimeService.updateSessionId(BaseController.getJSessionIDCookie(request).getValue(), SessionUtil.getPageRequestId(request));
+			
 			log.info(" > > > > > SUCCESS LOGOUT");
 			return true;
 		} catch (Exception e) {
@@ -250,7 +250,7 @@ public class UserSessionService {
 	 * @return
 	 */
 	public String getToken(User user) {
-		UserSessionModel reqModel = registryService.getModel(user.getLoginKey());
+		UserSessionModel reqModel = runtimeService.getModel(user.getLoginKey());
 		if (reqModel == null) {
 			throw new RuntimeErrorException(null, "Invalid Session");
 		}
@@ -261,6 +261,7 @@ public class UserSessionService {
 	public boolean validatePageRequest(HttpServletRequest httpServletRequest) {
 		final String requestId = SessionUtil.getPageRequestId(httpServletRequest);
 
+		log.debug("requestId Provided: {}", requestId);
 		if (null == requestId) {
 			return false;
 		}
@@ -268,12 +269,12 @@ public class UserSessionService {
 		RegisteredRequest registeredRequest = getRegisteredRequest(requestId);
 
 		if (registeredRequest != null) {
-			log.info("Found Registered Request: " + registeredRequest);
+			log.debug("Found Registered Request: " + registeredRequest);
 			return true;
 		}
-		log.info("Reuqest not registered");
+		log.debug("REQUEST not registered");
 
-		return registryService.validatePageRequest(httpServletRequest);
+		return runtimeService.validatePageRequest(httpServletRequest);
 	}
 
 	public RegisteredRequest getRegisteredRequest(String requestId) {
@@ -284,7 +285,7 @@ public class UserSessionService {
 		log.info("registeredRequest from DB with req Id ({}): {}", requestId, registeredRequest);
 
 		if (null == registeredRequest) {
-			sessionData = registryService.getModel(SESSION_DATA);
+			sessionData = runtimeService.getModel(SESSION_DATA);
 		}
 		if (null != sessionData) {
 			registeredRequest = sessionData.getRequest(requestId);
@@ -320,7 +321,7 @@ public class UserSessionService {
 	 * 
 	 */
 
-	public WebResponse requestId(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+	public WebResponse generateRequestId(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
 		String requestId;
 
 		if (validatePageRequest(servletRequest)) {
@@ -338,10 +339,10 @@ public class UserSessionService {
 
 		SessionData sessionData = generateSessionData(servletRequest, servletResponse, requestId);
 
-		if (!registryService.set(SESSION_DATA, sessionData))
+		if (!runtimeService.set(SESSION_DATA, sessionData))
 			throw new RuntimeErrorException(null, "Error generating request id");
 
-		log.info("NEW Session Data Created: {}", (SessionData) registryService.getModel(SESSION_DATA));
+		log.info("NEW Session Data Created: {}", (SessionData) runtimeService.getModel(SESSION_DATA));
 		realtimeService.sendUpdateSession(getAvailableSessions());
 
 		return WebResponse.builder().code("00").message(requestId).build();
@@ -355,13 +356,13 @@ public class UserSessionService {
 	private SessionData generateSessionData(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			String requestId) {
 
-		SessionData sessionData = registryService.getModel(SESSION_DATA);
+		SessionData sessionData = runtimeService.getModel(SESSION_DATA);
 
 		if (null == sessionData) {
-			if (!registryService.set(SESSION_DATA, new SessionData()))
+			if (!runtimeService.set(SESSION_DATA, new SessionData()))
 				throw new RuntimeErrorException(null, "Error getting session data");
 
-			sessionData = registryService.getModel(SESSION_DATA);
+			sessionData = runtimeService.getModel(SESSION_DATA);
 		}
 
 		RegisteredRequest requestv2 = SessionUtil.buildRegisteredRequest(servletRequest, requestId);
@@ -386,16 +387,16 @@ public class UserSessionService {
 	}
 
 	private List<RegisteredRequest> getAvailableSessionList() {
-		SessionData sessionData = registryService.getModel(SESSION_DATA);
+		SessionData sessionData = runtimeService.getModel(SESSION_DATA);
 
 		if (null == sessionData) {
 			log.info("Session Data IS NULL");
-			boolean successSettingRegistry = registryService.set(SESSION_DATA, new SessionData());
+			boolean successSettingRegistry = runtimeService.set(SESSION_DATA, new SessionData());
 
 			if (!successSettingRegistry)
 				throw new RuntimeErrorException(null, "Error updating session data");
 
-			sessionData = registryService.getModel(SESSION_DATA);
+			sessionData = runtimeService.getModel(SESSION_DATA);
 		} else {
 			log.info("sessionData found: {}", sessionData);
 		}
@@ -406,11 +407,11 @@ public class UserSessionService {
 	}
 
 	public void setActiveSession(String requestId, boolean active) {
-		SessionData sessionData = registryService.getModel(SESSION_DATA);
+		SessionData sessionData = runtimeService.getModel(SESSION_DATA);
 		if (null == sessionData) {
 			return;
 		}
-		((SessionData) registryService.getModel(SESSION_DATA)).setActiveSession(requestId, active);
+		((SessionData) runtimeService.getModel(SESSION_DATA)).setActiveSession(requestId, active);
 	}
 
 	public RegisteredRequest getAvailableSession(String requestId) {
@@ -425,25 +426,25 @@ public class UserSessionService {
 	}
 
 	public WebResponse deleteSession(WebRequest request) {
-		SessionData sessionData = registryService.getModel(SESSION_DATA);
+		SessionData sessionData = runtimeService.getModel(SESSION_DATA);
 		String requestId = request.getRegisteredRequest().getRequestId();
 		
 		sessionData.remove(requestId );
 
-		if (!registryService.set(SESSION_DATA, sessionData))
+		if (!runtimeService.set(SESSION_DATA, sessionData))
 			throw new RuntimeErrorException(null, "Error updating session data");
 
 		return WebResponse.builder().code("00").sessionData(sessionData).build();
 	}
 
 	public WebResponse clearSessions() {
-		SessionData sessionData = registryService.getModel(SESSION_DATA);
+		SessionData sessionData = runtimeService.getModel(SESSION_DATA);
 		sessionData.clear();
 
-		if (!registryService.set(SESSION_DATA, sessionData))
+		if (!runtimeService.set(SESSION_DATA, sessionData))
 			throw new RuntimeErrorException(null, "Error updating session data");
 
-		sessionData = registryService.getModel(SESSION_DATA);
+		sessionData = runtimeService.getModel(SESSION_DATA);
 
 		realtimeService.sendUpdateSession(getAvailableSessions());
 		return WebResponse.builder().code("00").sessionData(sessionData).build();

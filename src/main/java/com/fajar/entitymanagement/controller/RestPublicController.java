@@ -46,7 +46,7 @@ public class RestPublicController extends BaseController {
 	public WebResponse getRequestId(@RequestBody WebRequest request, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse) throws IOException {
 		log.info("register {}", request);
-		WebResponse response = userSessionService.requestId(httpRequest, httpResponse);
+		WebResponse response = userSessionService.generateRequestId(httpRequest, httpResponse);
 		return response;
 	}
 

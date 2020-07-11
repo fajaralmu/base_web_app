@@ -46,10 +46,10 @@ public class BaseController {
 	@Autowired
 	protected RuntimeService registryService;
 	@Autowired
-	protected UserSessionService userService; 
+	protected UserSessionService userService;
 	@Autowired
 	protected ComponentService componentService;
- 
+
 	@ModelAttribute("profile")
 	public Profile getProfile(HttpServletRequest request) {
 		return webAppConfiguration.getProfile();
@@ -113,7 +113,7 @@ public class BaseController {
 		return componentService.getPages(request);
 	}
 
-	@ModelAttribute("year") ///required in the footer
+	@ModelAttribute("year") /// required in the footer
 	public int getCurrentYear(HttpServletRequest request) {
 		return DateUtil.getCalendarItem(new Date(), Calendar.YEAR);
 	}
@@ -127,9 +127,9 @@ public class BaseController {
 		String pageCode = componentService.getPageCode(request);
 		userSessionService.setActivePage(request, pageCode);
 	}
-	
+
 	public void setActivePage(HttpServletRequest request, String pageCode) {
- 
+
 		userSessionService.setActivePage(request, pageCode);
 	}
 
@@ -172,7 +172,7 @@ public class BaseController {
 		try {
 			response.sendRedirect(url);
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		}
 	}
@@ -180,44 +180,51 @@ public class BaseController {
 	private static void addResourcePaths(ModelAndView modelAndView, String resourceName, String... paths) {
 		List<KeyPair<Object, String>> resoucePaths = new ArrayList<>();
 		for (int i = 0; i < paths.length; i++) {
-			KeyPair<Object, String>  keyPair = new KeyPair<Object, String>(i, paths[i], true);
+			KeyPair<Object, String> keyPair = new KeyPair<Object, String>(i, paths[i], true);
 			resoucePaths.add(keyPair);
 			log.info("{}. Add {} to {} , value: {}", i, resourceName, modelAndView.getViewName(), paths[i]);
 		}
 		setModelAttribute(modelAndView, resourceName, resoucePaths);
 	}
-	
+
 	private static void setModelAttribute(ModelAndView modelAndView, String attrName, Object attrValue) {
-		if(null == attrValue) { return ; }
+		if (null == attrValue) {
+			return;
+		}
 		modelAndView.getModel().put(attrName, attrValue);
 	}
 
 	public static void addStylePaths(ModelAndView modelAndView, String... paths) {
-		if(null == paths) {
+		if (null == paths) {
 			return;
 		}
 		addResourcePaths(modelAndView, "additionalStylePaths", paths);
 	}
 
 	public static void addJavaScriptResourcePaths(ModelAndView modelAndView, String... paths) {
-		if(null == paths) {
+		if (null == paths) {
 			return;
 		}
 		addResourcePaths(modelAndView, "additionalScriptPaths", paths);
 	}
 
 	public static void addTitle(ModelAndView modelAndView, String title) {
-		if(null == title || title.isEmpty()) {
+		if (null == title || title.isEmpty()) {
 			return;
 		}
 		setModelAttribute(modelAndView, "title", title);
 	}
 
 	public static void addPageUrl(ModelAndView modelAndView, String pageUrl) {
-		if(null == pageUrl || pageUrl.isEmpty()) {
+		if (null == pageUrl || pageUrl.isEmpty()) {
 			return;
 		}
 		setModelAttribute(modelAndView, "pageUrl", pageUrl);
-		
+
+	}
+
+	public static Cookie getJSessionIDCookie(HttpServletRequest request) {
+
+		return getCookie(SessionUtil.JSESSSIONID, request.getCookies());
 	}
 }

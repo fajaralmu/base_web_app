@@ -52,10 +52,10 @@ public class RuntimeService {
 		try {
 			Serializable serializable = SESSION_MAP.get(key);
 			T finalObj = (T) serializable;
-			
+
 			log.info("==registry model: " + finalObj);
 			return finalObj;
-			
+
 		} catch (Exception ex) {
 			log.info("Unexpected error");
 			ex.printStackTrace();
@@ -63,15 +63,15 @@ public class RuntimeService {
 		}
 	}
 
-	/**  
+	/**
 	 * @param key
 	 * @param registryModel
 	 * @return
 	 */
 	public boolean set(String key, Serializable registryModel) {
-		try { 
-			SESSION_MAP.put(key, registryModel); 
-			return true; 
+		try {
+			SESSION_MAP.put(key, registryModel);
+			return true;
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -85,7 +85,7 @@ public class RuntimeService {
 	public boolean remove(String key) {
 		try {
 			SESSION_MAP.remove(key);
-			return true; 
+			return true;
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -93,7 +93,7 @@ public class RuntimeService {
 
 	}
 
-	/**  
+	/**
 	 * @param value
 	 * @return
 	 */
@@ -104,7 +104,7 @@ public class RuntimeService {
 		if (getModel(PAGE_REQUEST) != null) {
 
 			model = (UserSessionModel) getModel(PAGE_REQUEST);
-			model.getTokens().put(pageRequestId, value); 
+			model.getTokens().put(pageRequestId, value);
 
 		} else {
 
@@ -113,11 +113,11 @@ public class RuntimeService {
 				{
 					put(pageRequestId, value);
 				}
-			}); 
+			});
 		}
 		if (set(PAGE_REQUEST, model)) {
 			return pageRequestId;
-		}else {
+		} else {
 			return null;
 		}
 
@@ -128,6 +128,17 @@ public class RuntimeService {
 		return StringUtil.generateRandomNumber(15);
 	}
 
+	public void updateSessionId(String newSessionId, String requestId) {
+		try {
+			((UserSessionModel) getModel(PAGE_REQUEST)).getTokens().put(requestId, newSessionId);
+			log.info("SessionID UPDATED!!");
+			
+		} catch (Exception e) {
+			log.error("Error update SessionID on runtime");
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * check page request against cookie jsessionID
 	 * 
@@ -136,32 +147,33 @@ public class RuntimeService {
 	 */
 	public boolean validatePageRequest(HttpServletRequest httpServletRequest) {
 		log.info("Will validate page request");
-		
+
 		try {
 			UserSessionModel model = (UserSessionModel) getModel(PAGE_REQUEST);
 
 			if (null == model) {
+				log.debug("MODEL IS NULL");
 				return false;
 			}
 
-			Cookie jsessionCookie = BaseController.getCookie(SessionUtil.JSESSSIONID, httpServletRequest.getCookies());
-			String pageRequestId = SessionUtil.getPageRequestId(httpServletRequest);  
-			
-			boolean exist = model.getTokens().get(pageRequestId) != null;
-			
-			if (exist) {
-				String requestIdValue = (String) model.getTokens().get(pageRequestId); 
-				
-				boolean requestIdMatchCookie = requestIdValue.equals(jsessionCookie.getValue());
+			Cookie jsessionCookie = BaseController.getJSessionIDCookie(httpServletRequest);
+			String pageRequestId = SessionUtil.getPageRequestId(httpServletRequest);
 
-				log.info(" Request ID value: {} vs JSessionId: {}",  requestIdValue + jsessionCookie.getValue());
-				log.info("requestIdMatchCookie: {}", requestIdMatchCookie);
-				
+			boolean exist = model.getTokens().get(pageRequestId) != null;
+
+			if (exist) {
+				String sessionId = (String) model.getTokens().get(pageRequestId);
+
+				boolean requestIdMatchCookie = sessionId.equals(jsessionCookie.getValue());
+
+				log.debug("sessionId value: {} vs JSessionId cookie: {}", sessionId, jsessionCookie.getValue());
+				log.debug("sessionIdMatchCookie: {}", requestIdMatchCookie);
+
 				return requestIdMatchCookie;
 			} else {
-				log.info("x x x x Request ID not found x x x x");
+				log.debug("x x x x Request ID not found x x x x");
 				return false;
-			} 
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			return false;
