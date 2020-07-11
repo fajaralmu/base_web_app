@@ -31,7 +31,7 @@
 					<div class="dropdown-menu">
 						<a class="dropdown-item"
 							href="<spring:url value="/management/profile"/>">Profile</a> <a
-							class="dropdown-item" href="#" onclick="logout()">Logout</a>
+							class="dropdown-item" href="<spring:url value="/account/logout"/>" onclick="logout()">Logout</a>
 					</div>
 				</div>
 			</c:if>
@@ -44,7 +44,7 @@
 			</c:if> --%>
 
 			<c:forEach var="pageItem" items="${pages}">
-				<li class="nav-item" style="position: relative;"><a
+				<li class="nav-item page-li"  ><a
 					class="nav-link pagelink" id="${pageItem.code }"
 					menupage="${pageItem.isMenuPage() }"
 					href="<spring:url value="${pageItem.link }"/>">${pageItem.name }</a></li>
@@ -61,7 +61,7 @@
 	var pageMenus = {};
 	var ctxPath = "${contextPath}";
 	function logout() {
-		postReq(
+		/* postReq(
 				"<spring:url value="/api/account/logout" />",
 				{},
 				function(xhr) {
@@ -73,7 +73,7 @@
 					} else {
 						alert("LOGOUT FAILS");
 					}
-				});
+				}); */
 	}
 
 	function getCurrentPageCode() {
