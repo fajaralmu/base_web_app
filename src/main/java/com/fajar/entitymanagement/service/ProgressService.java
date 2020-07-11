@@ -38,8 +38,7 @@ public class ProgressService {
 	 * @param requestId
 	 */
 	public void sendProgress(double progress, double maxProgress, double percent, boolean newProgress,
-			HttpServletRequest httpServletRequest) {
-		String requestId = getRequestId(httpServletRequest);
+			String requestId) {
 
 		if (newProgress) {
 			currentProgress = 0.0;
@@ -48,6 +47,12 @@ public class ProgressService {
 		log.info("%%%%%%|PROGRESS|%%%%%%% : " + currentProgress + " adding :" + progress + "/" + maxProgress
 				+ ", portion: " + percent + " ==> " + currentProgress * percent);
 		realtimeService.sendProgress(currentProgress * percent, requestId);
+	}
+
+	public void sendProgress(double progress, double maxProgress, double percent, boolean newProgress,
+			HttpServletRequest httpServletRequest) {
+		String requestId = getRequestId(httpServletRequest);
+		this.sendProgress(progress, maxProgress, percent, newProgress, requestId);
 	}
 
 	public void sendProgress(double progress, double maxProgress, double percent,

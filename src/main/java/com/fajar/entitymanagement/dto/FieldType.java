@@ -16,5 +16,14 @@ public enum FieldType {
 	public final String value;
 	private FieldType(String val) {
 		this.value = val;
+	}
+	public static FieldType getByValue(String value) {
+		for(FieldType fieldType : FieldType.values()) {
+			if(fieldType.value.equals(value)) {
+				return fieldType;
+			}
+		}
+		
+		return FIELD_TYPE_TEXT;
 	} 
 }
