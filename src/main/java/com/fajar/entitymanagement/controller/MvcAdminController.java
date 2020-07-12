@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.fajar.entitymanagement.annotation.Authenticated;
 import com.fajar.entitymanagement.annotation.CustomRequestInfo;
 import com.fajar.entitymanagement.service.LogProxyFactory;
-import com.fajar.entitymanagement.util.SessionUtil;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -6,6 +6,7 @@ import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.connector.RequestFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -103,7 +104,7 @@ public class InterceptorProcessor {
 
 		log.info("intercept webpage handler: {}", request.getRequestURI());
 		boolean authenticationRequired = getAuthenticationAnnotation(handlerMethod) != null;
-		
+
 		log.info("URI: {} requires authentication: {}", request.getRequestURI(), authenticationRequired);
 
 		if (authenticationRequired) {
@@ -123,15 +124,18 @@ public class InterceptorProcessor {
 				progressService.init(SessionUtil.getPageRequestId(request));
 			}
 		}
-		
+
 		this.setActivePage(request);
 		return true;
 	}
-	
+
 	private void setActivePage(HttpServletRequest httpServletRequest) {
-		//TODO: remove
+		// TODO: remove
 		log.debug("httpServletRequest Class: {}", httpServletRequest.getClass().getCanonicalName());
-		
+		if (httpServletRequest instanceof RequestFacade) {
+			RequestFacade requestFacade = (RequestFacade) httpServletRequest;
+			
+		}
 		String pageCode = componentService.getPageCode(httpServletRequest);
 		userSessionService.setActivePage(httpServletRequest, pageCode);
 	}
@@ -254,7 +258,7 @@ public class InterceptorProcessor {
 			BaseController.addStylePaths(modelAndView, resourcePath.stylePaths());
 			BaseController.addTitle(modelAndView, resourcePath.title());
 			BaseController.addPageUrl(modelAndView, resourcePath.pageUrl());
- 
+
 		}
 
 		if (null != resourcePath && resourcePath.withRealtimeProgress()) {

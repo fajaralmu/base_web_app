@@ -18,7 +18,7 @@ import com.fajar.entitymanagement.service.LogProxyFactory;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
-@RequestMapping("webpage")
+@RequestMapping("webapp")
 @Slf4j
 public class MvcPagesController extends BaseController {
 
