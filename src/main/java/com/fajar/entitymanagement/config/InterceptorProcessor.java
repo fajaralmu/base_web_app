@@ -6,7 +6,6 @@ import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.connector.RequestFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -129,13 +128,7 @@ public class InterceptorProcessor {
 		return true;
 	}
 
-	private void setActivePage(HttpServletRequest httpServletRequest) {
-		// TODO: remove
-		log.debug("httpServletRequest Class: {}", httpServletRequest.getClass().getCanonicalName());
-		if (httpServletRequest instanceof RequestFacade) {
-			RequestFacade requestFacade = (RequestFacade) httpServletRequest;
-			
-		}
+	private void setActivePage(HttpServletRequest httpServletRequest) { 
 		String pageCode = componentService.getPageCode(httpServletRequest);
 		userSessionService.setActivePage(httpServletRequest, pageCode);
 	}
@@ -240,7 +233,8 @@ public class InterceptorProcessor {
 
 		return hasRestController || hasPostMapping;
 	}
-
+ 
+	
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler,
 			ModelAndView modelAndView) {
 
@@ -259,14 +253,15 @@ public class InterceptorProcessor {
 			BaseController.addTitle(modelAndView, resourcePath.title());
 			BaseController.addPageUrl(modelAndView, resourcePath.pageUrl());
 
+		}else {
+			
 		}
 
 		if (null != resourcePath && resourcePath.withRealtimeProgress()) {
 			progressService.sendComplete(request);
 		}
 
-	}
-
+	} 
 	public static void validateStylePaths(String[] paths) {
 		if (null == paths)
 			return;

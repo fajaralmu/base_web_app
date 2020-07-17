@@ -41,10 +41,12 @@ public class MyHandlerInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-
+		log.debug("POST HANDLE URI: {}", request.getRequestURI());
 		if (handler instanceof HandlerMethod) {
 			interceptorProcessor.postHandle(request, response, (HandlerMethod) handler, modelAndView);
 
+		}else {
+			log.debug("Req URI: {}, Class for handler: {}",request.getRequestURI(), handler.getClass());
 		}
 
 		super.postHandle(request, response, handler, modelAndView);
@@ -55,6 +57,8 @@ public class MyHandlerInterceptor extends HandlerInterceptorAdapter {
 			throws Exception {
 
 		super.afterCompletion(request, response, handler, ex);
+		log.debug("AFTER COMPLETION: {}", request.getRequestURI());
+		log.debug("Response Status: {}", response.getStatus());
 	}
 
 }

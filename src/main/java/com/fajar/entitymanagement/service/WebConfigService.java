@@ -1,6 +1,6 @@
 package com.fajar.entitymanagement.service;
 
-import static com.fajar.entitymanagement.util.CollectionUtil.isEmptyArray;
+import static com.fajar.entitymanagement.util.CollectionUtil.emptyArray;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -233,7 +233,7 @@ public class WebConfigService {
 
 	private ParameterizedType getJpaRepositoryType(Class<?> _class) {
 		Type[] genericInterfaces = _class.getGenericInterfaces();
-		if (CollectionUtil.isEmptyArray(genericInterfaces))
+		if (CollectionUtil.emptyArray(genericInterfaces))
 			return null;
 
 		try {
@@ -258,7 +258,7 @@ public class WebConfigService {
 			Type[] typeArguments = jpaRepositoryType.getActualTypeArguments();// type.getTypeParameters();
 			CollectionUtil.printArray(typeArguments);
 
-			if (isEmptyArray(typeArguments)) {
+			if (emptyArray(typeArguments)) {
 				return null;
 			}
 

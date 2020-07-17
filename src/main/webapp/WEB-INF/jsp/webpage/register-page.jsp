@@ -18,26 +18,27 @@
 					<label for="useraname"> Username </label>
 				</div>
 				<div>
-					<input id="useraname" class="form-control" type="text" /> <span
-						id="user-availability"></span>
+					<input id="useraname" class="form-control" type="text" required />
+					<span id="user-availability"></span>
 				</div>
 				<div>
 					<label for="name"> Display Name </label>
 				</div>
 				<div>
-					<input id="name" class="form-control" type="text" />
+					<input id="name" class="form-control" type="text" required />
 				</div>
 				<div>
 					<label for="password"> Password </label>
 				</div>
 				<div>
-					<input id="password" type="password" class="login-field" />
+					<input id="password" type="password" class="login-field" required />
 				</div>
 				<div>
 					<label for="re_password"> Password </label>
 				</div>
 				<div>
-					<input id="re_password" type="password" class="login-field" />
+					<input id="re_password" type="password" class="login-field"
+						required />
 				</div>
 
 				<div>
@@ -80,15 +81,23 @@
 					usernameAvailabilityInfo.style.color = color;
 				});
 	}
+	
+	
 
-	function register() {
-
+	function register() { 
+	
+		if(isOneOfInputFieldEmpty(rePasswordField, passwordField, usernameField, nameField)){
+			alert("Please complete the fields!");
+			return;
+		}
+	
 		if (rePasswordField.value != passwordField.value) {
 			alert("Password does not match!");
 			
 			return;
-		}
-
+		} 
+		 
+		
 		const requestObject = {
 			'user' : {
 				'displayName' : nameField.value,

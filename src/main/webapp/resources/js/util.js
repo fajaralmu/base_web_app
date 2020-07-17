@@ -611,4 +611,17 @@ function getNextPage(currentPage, buttonCount){
 	return currentPageIsLastPage ? currentPage : currentPage + 1;
 }
 
+function isOneOfInputFieldEmpty(...inputfields ){
+	
+	for (var i = 0; i < inputfields.length; i++) {
+		const input = inputfields[i];
+		if(input.value == null || input.value.trim() == ""){
+			return true;
+		}
+		
+	}
+	
+	return false;
+	
+}
 

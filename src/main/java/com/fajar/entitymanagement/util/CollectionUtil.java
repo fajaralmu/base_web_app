@@ -1,5 +1,6 @@
 package com.fajar.entitymanagement.util;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,22 +37,22 @@ public class CollectionUtil {
 			List<T> mapValue = map.get(key);
 			if (null == mapValue)
 				continue;
-
+			
 			list.addAll(mapValue);
 		}
 
 		return list;
 	}
+	 
 
-	public static <T> String printArray(T[] array) {
+	public static <T> void printArray(T[] array) {
 		if (null == array) {
-			return "";
+			return;
 		}
 
 		String[] arrayString = toArrayOfString(array);
-		String result = String.join(", ", arrayString);
-		log.info("Print Array: [{}]", result);
-		return result;
+		log.info("Print Array: [{}]", String.join(", ", arrayString));
+
 	}
 
 	public static <T> List<T> listOf(T o) {
@@ -61,11 +62,11 @@ public class CollectionUtil {
 		return list;
 	}
 
-	public static <T, I> List<T> convertList(List<I> list) {
+	public static <T> List<T> convertList(List<?> list) {
 		List<T> newList = new ArrayList<T>();
-		for (I object : list) {
+		for (Object object : list) {
 			try {
-				newList.add((T) object);
+				newList.add(EntityUtil.castObject(object));
 			} catch (Exception e) {
 
 			}
@@ -73,14 +74,13 @@ public class CollectionUtil {
 		return newList;
 	}
 
-	public static <T> String[] toArrayOfString(List<T> anyList) {
-		if (anyList == null) {
+	public static String[] toArrayOfString(List<?> validUrls) {
+		if (validUrls == null) {
 			return new String[] {};
 		}
-		String[] array = new String[anyList.size()];
-		for (int i = 0; i < anyList.size(); i++) {
-			if (anyList.get(i) != null)
-				array[i] = anyList.get(i).toString();
+		String[] array = new String[validUrls.size()];
+		for (int i = 0; i < validUrls.size(); i++) {
+			array[i] = validUrls.get(i).toString();
 		}
 		return array;
 	}
@@ -97,14 +97,37 @@ public class CollectionUtil {
 			array[i] = arrays[i].toString();
 		}
 		return array;
-	} 
-
-	public static <T> boolean isEmptyArray(T[] array) {
-		if (null == array)
-			return true;
-		if (0 == array.length)
-			return true;
-
-		return false;
 	}
+
+	public static <T> boolean emptyArray(T[] arr) {
+		return arr == null || arr.length == 0;
+	}
+
+	public static <T> Object[] toObjectArray(T[] rawArray) {
+		 
+		Object[]  resultArray = new Object[rawArray.length];
+		
+		for (int i = 0; i < rawArray.length; i++) {
+			resultArray[i] = rawArray[i];
+		}
+		return resultArray;
+	}
+
+	public static Object[] objectElementsToArray(final String fieldName, Object...array) {
+		try {
+			Object sampleObject = array[0];
+			Object[] result = new Object[array.length];
+			Field field = EntityUtil.getDeclaredField(sampleObject.getClass(), fieldName);
+			for (int i = 0; i < array.length; i++) {
+				Object object = array[i];
+				Object fieldValue = field.get(object);
+				result[i] = fieldValue;
+			}
+			
+			return result;
+		}catch (Exception e) {
+			return new Object[] {"EMPTY"};
+		}
+	}
+
 }

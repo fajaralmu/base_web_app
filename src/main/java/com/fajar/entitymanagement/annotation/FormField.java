@@ -30,5 +30,6 @@ public @interface FormField {
 	public String[] availableValues() default {};
 	public String[] detailFields() default {}; 
 	public String[] multiply() default {};
+	public boolean emptyAble() default true;
 
 }
