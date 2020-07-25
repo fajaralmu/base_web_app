@@ -10,6 +10,8 @@ import java.util.Map;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fajar.entitymanagement.annotation.AdditionalQuestionField;
 import com.fajar.entitymanagement.annotation.BaseField;
 import com.fajar.entitymanagement.annotation.Dto;
@@ -86,6 +88,7 @@ public class EntityElement implements Serializable {
 		this.ignoreBaseField = entityProperty.isIgnoreBaseField();
 		this.entityProperty = entityProperty;
 		this.isGrouped = entityProperty.isQuestionare();
+		
 		init();
 	}
 

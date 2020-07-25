@@ -33,16 +33,16 @@ public class Menu extends BaseEntity {
 	private static final long serialVersionUID = -6895624969478733293L;
 
 	@FormField
-	@Column
+	@Column(unique = true)
 	private String code;
 	@FormField
-	@Column
+	@Column(unique = true)
 	private String name;
 	@FormField(type = FieldType.FIELD_TYPE_TEXTAREA)
 	@Column
 	private String description;
 	@FormField
-	@Column
+	@Column(unique = true)
 	private String url;
 
 	@JoinColumn(name = "page_id", nullable = false)

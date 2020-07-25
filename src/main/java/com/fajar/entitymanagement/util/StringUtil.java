@@ -91,4 +91,17 @@ public class StringUtil {
 		}
 	}
 
+	public static String upperCaseFirstChar(String string) {
+		try {
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.append(String.valueOf(string.charAt(0)).toUpperCase());
+			stringBuilder.append(string.substring(1, string.length()));
+
+			return stringBuilder.toString();
+		} catch (Exception e) {
+
+			return string;
+		}
+	}
+
 }

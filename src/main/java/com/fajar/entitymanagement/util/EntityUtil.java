@@ -13,8 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 
 import org.apache.commons.lang3.SerializationUtils;
 
@@ -122,13 +124,13 @@ public class EntityUtil {
 		for (int i = 0; i < formFieldAnnotatedField.size(); i++) {
 			Field field = formFieldAnnotatedField.get(i);
 			FormField formField = getFieldAnnotation(field, FormField.class);
-			
-			if(field.getType().equals(String.class) && !formField.emptyAble()) {
+
+			if (field.getType().equals(String.class) && !formField.emptyAble()) {
 				result.add(field);
 			}
-			
+
 		}
-		
+
 		return result;
 	}
 
@@ -225,27 +227,47 @@ public class EntityUtil {
 		return null;
 	}
 
+	public static List<Field> getDeclaredFields(Class<?> clazz) {
+		return getDeclaredFields(clazz, true, false);
+	}
+
 	/**
-	 * get fields of a class, accessible true
 	 * 
 	 * @param clazz
+	 * @param includeSuper
+	 * @param onlyColumnField
 	 * @return
 	 */
-	public static List<Field> getDeclaredFields(Class<?> clazz) {
+	public static List<Field> getDeclaredFields(Class<?> clazz, boolean includeSuper, boolean onlyColumnField) {
 		Field[] baseField = clazz.getDeclaredFields();
 //
 //		List<EntityElement> entityElements = new ArrayList<EntityElement>();
 		List<Field> fieldList = new ArrayList<>();
 
-		for (Field field : baseField) {
+		loop1: for (Field field : baseField) {
+
+			Object column = getFieldAnnotation(field, Column.class);
+			if(onlyColumnField && null == column)
+				column = getFieldAnnotation(field, JoinColumn.class);
+			
+			if (onlyColumnField && column == null)
+				continue loop1;
+
 			field.setAccessible(true);
 			fieldList.add(field);
 		}
-		if (clazz.getSuperclass() != null) {
+		if (includeSuper && clazz.getSuperclass() != null) {
 
 			Field[] parentFields = clazz.getSuperclass().getDeclaredFields();
 
-			for (Field field : parentFields) {
+			loop2: for (Field field : parentFields) {
+				Object column = getFieldAnnotation(field, Column.class);
+				if(onlyColumnField && null == column)
+					column = getFieldAnnotation(field, JoinColumn.class);
+				
+				if (onlyColumnField && column == null)
+					continue loop2;
+
 				field.setAccessible(true);
 				fieldList.add(field);
 			}

@@ -33,7 +33,7 @@ public class UserRole extends BaseEntity {
 	@Column
 	@FormField
 	private String access;
-	@Column
+	@Column(unique = true)
 	@FormField
 	private String code;
 
