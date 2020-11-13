@@ -10,6 +10,8 @@
 <meta http-equiv="Content-Type"
 	content="text/html; charset=windows-1256">
 <title>${title}</title>
+<link rel="icon" href="<c:url value="${pageIconUrl }"></c:url >"
+	type="image/x-icon">
 <link rel="stylesheet" type="text/css"
 	href="<c:url value="/res/css/shop.css?version=1"></c:url>" />
 <link rel="stylesheet" type="text/css"
