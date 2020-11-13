@@ -3,6 +3,7 @@ package com.fajar.entitymanagement.service;
 import java.util.Optional;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,6 +16,9 @@ import com.fajar.entitymanagement.entity.User;
 import com.fajar.entitymanagement.entity.UserRole;
 import com.fajar.entitymanagement.repository.UserRepository;
 import com.fajar.entitymanagement.repository.UserRoleRepository;
+import com.fajar.entitymanagement.service.sessions.RegisteredRequestService;
+import com.fajar.entitymanagement.service.sessions.SessionValidationService;
+import com.fajar.entitymanagement.service.sessions.UserSessionService;
 import com.fajar.entitymanagement.util.SessionUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 public class UserAccountService {
 
 	@Autowired
-	private UserSessionService userSessionService;
+	private UserSessionService userDataService;
+	@Autowired
+	private SessionValidationService sessionValidationService;
+	@Autowired
+	private RegisteredRequestService registeredRequestService;
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
@@ -84,32 +92,41 @@ public class UserAccountService {
 	 */
 	public WebResponse login(WebRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse)
 			throws Exception {
-		User dbUser = userSessionService.getUserByUsernameAndPassword(request);
-
+		
+		User dbUser = userDataService.addUserSession(request, httpRequest, httpResponse); 
+		
 		if (dbUser == null) {
 			return new WebResponse("01", "invalid credential");
 		}
-
-		userSessionService.addUserSession(dbUser, httpRequest, httpResponse);
 		
 		registerRequestId(httpRequest, httpResponse); 
+		setSessionRequestUri(httpRequest, httpResponse); 
+		
+		try {
+			httpRequest.login(dbUser.getUsername(), dbUser.getPassword());
+			httpRequest.authenticate(httpResponse);
+		}catch (Exception e) {
+			log.error("Error servlet login");
+			e.printStackTrace();
+		}
+		
+		log.info("Login Success"); 
+		return WebResponse.success();
+	}
 
-		log.info("LOGIN SUCCESS");
-
+	private static void setSessionRequestUri(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+		 
 		String sessionRequestUri = SessionUtil.getSessionRequestUri(httpRequest);
 
 		if (sessionRequestUri != null) {
 			log.debug("goto page after login: " + sessionRequestUri);
- 
 			httpResponse.setHeader("location", sessionRequestUri); 
-//			response.setRedirectUrl(sessionRequestUri);
 		} 
-		return WebResponse.success();
 	}
 
 	private void registerRequestId(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
 		 
-		WebResponse requestIdResponse = userSessionService.generateRequestId(httpRequest, httpResponse);
+		WebResponse requestIdResponse = registeredRequestService.generateRequestId(httpRequest, httpResponse);
 		SessionUtil.setSessionRegisteredRequestId(httpRequest, requestIdResponse);
 
 	}
@@ -122,7 +139,13 @@ public class UserAccountService {
 	 */
 	public boolean logout(HttpServletRequest httpRequest) {
 
-		boolean logoutResult = userSessionService.logout(httpRequest);
+		boolean logoutResult = userDataService.removeUserSession(httpRequest);
+		try {
+			httpRequest.logout();
+		} catch (ServletException e) {
+			log.error("Error Logging Out");
+			e.printStackTrace();
+		}
 		return logoutResult;
 	}
 
@@ -133,16 +156,22 @@ public class UserAccountService {
 	 * @return
 	 */
 	public boolean validateToken(HttpServletRequest httpRequest) {
+		boolean hasSession = sessionValidationService.hasSession(httpRequest);
+		if(hasSession) {
+			return true;
+		}
 		String requestToken = SessionUtil.getRequestToken(httpRequest);
+		
+		return validateToken(requestToken, httpRequest);
 		/**
 		 * TESTING
 		 */
-		boolean pageRequestValidated = userSessionService.validatePageRequest(httpRequest);
-		if (pageRequestValidated) {
-			return true;
-		} else {
-			return validateToken(requestToken, httpRequest);
-		}
+//		boolean pageRequestValidated = sessionValidationService.validatePageRequest(httpRequest);
+//		if (pageRequestValidated) {
+//			return true;
+//		} else {
+//			return validateToken(requestToken, httpRequest);
+//		}
 	}
 
 	/**
@@ -160,7 +189,7 @@ public class UserAccountService {
 
 		} else {
 
-			String existingToken = userSessionService.getToken(httpRequest);
+			String existingToken = sessionValidationService.getTokenByServletRequest(httpRequest);
 			log.info("|| REQUEST_TOKEN: " + requestToken + " vs EXISTING:" + existingToken + "||");
 
 			boolean tokenEquals = requestToken.equals(existingToken);

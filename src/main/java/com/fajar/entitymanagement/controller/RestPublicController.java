@@ -20,6 +20,7 @@ import com.fajar.entitymanagement.dto.WebRequest;
 import com.fajar.entitymanagement.dto.WebResponse;
 import com.fajar.entitymanagement.service.LogProxyFactory;
 import com.fajar.entitymanagement.service.UserAccountService;
+import com.fajar.entitymanagement.service.sessions.RegisteredRequestService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +33,8 @@ public class RestPublicController extends BaseController {
  
 	@Autowired
 	private UserAccountService userAccountService;
+	@Autowired
+	private RegisteredRequestService registeredRequestService;
 
 	@PostConstruct
 	public void init() {
@@ -46,17 +49,9 @@ public class RestPublicController extends BaseController {
 	public WebResponse getRequestId(@RequestBody WebRequest request, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse) throws IOException {
 		log.info("register {}", request);
-		WebResponse response = userSessionService.generateRequestId(httpRequest, httpResponse);
+		WebResponse response = registeredRequestService.generateRequestId(httpRequest, httpResponse);
 		return response;
-	}
-
-	@PostMapping(value = "/pagecode")
-	public WebResponse getCurrentPageCode(HttpServletRequest request, HttpServletResponse response) {
-		
-		validatePageRequest(request);
-		return WebResponse.builder().code(super.activePage(request)).build();
-	}
-	
+	} 
 	@PostMapping(value = "/checkusername")
 	public WebResponse checkUsernameAvailability(@RequestBody WebRequest request, HttpServletRequest httpServletRequest, HttpServletResponse response) {
 
@@ -71,7 +66,7 @@ public class RestPublicController extends BaseController {
 	}
 
 	public void validatePageRequest(HttpServletRequest req) {
-		boolean validated = userSessionService.validatePageRequest(req);
+		boolean validated = sessionValidationService.validatePageRequest(req);
 		if (!validated) {
 			throw new RuntimeException("Invalid page request");
 		}

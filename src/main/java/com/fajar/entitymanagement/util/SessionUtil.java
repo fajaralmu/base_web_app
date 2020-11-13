@@ -2,11 +2,9 @@ package com.fajar.entitymanagement.util;
 
 import java.util.Date;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.fajar.entitymanagement.controller.BaseController;
 import com.fajar.entitymanagement.dto.WebResponse;
 import com.fajar.entitymanagement.entity.RegisteredRequest;
 import com.fajar.entitymanagement.entity.User;
@@ -48,8 +46,12 @@ public class SessionUtil {
 	}
 
 	public static User getSessionUser(HttpServletRequest request) {
+		if (request.getSession(false) == null) {
+			return null;
+		}
 		try {
-			return (User) request.getSession(false).getAttribute(ATTR_USER);
+			Object result = request.getSession(false).getAttribute(ATTR_USER);
+			return result == null && !(result instanceof User) ? null : (User) result;
 		} catch (Exception e) {
 			log.info("invalid session object: {}", e);
 			return null;
@@ -62,19 +64,29 @@ public class SessionUtil {
 		log.info("REQUESTED URI: " + request.getRequestURI());
 	}
 
-	public static void setSessionUser(HttpServletRequest httpRequest, User dbUser) {
-
-		httpRequest.getSession().setAttribute(ATTR_USER, dbUser);
+	public static void updateSessionUser(HttpServletRequest httpRequest, User user) {
+		User currentUser = getSessionUser(httpRequest);
+		if (null == currentUser) {
+			log.info("current user session not found");
+			return;
+		}
+		if (user.getLoginKey() == null || user.getLoginKey().isEmpty()) {
+			user.setLoginKey(currentUser.getLoginKey());
+		}
+		user.setPassword(null);
+		setSessionUser(httpRequest, user);
 	}
 
-	public static void removeSessionUserAndInvalidate(HttpServletRequest request) { 
-		
+	public static void setSessionUser(HttpServletRequest httpRequest, User dbUser) {
+
+		httpRequest.getSession(true).setAttribute(ATTR_USER, dbUser);
+	}
+
+	public static void removeSessionUserAndInvalidate(HttpServletRequest request) {
+
 		request.getSession(false).removeAttribute(ATTR_USER);
 		request.getSession(false).invalidate();
-		
-		///////// create new session ////////////
-		request.getSession(true).setAttribute("created", new Date());
- 
+
 	}
 
 	public static String getSessionRequestUri(HttpServletRequest httpRequest) {
@@ -107,23 +119,18 @@ public class SessionUtil {
 
 	public static String getSessionPageCode(HttpServletRequest request) {
 		try {
-			log.info("getSessionPageCode : {}", request.getSession().getAttribute(PAGE_CODE));
-			
 			return request.getSession().getAttribute(PAGE_CODE).toString();
 		} catch (Exception e) {
-			log.error("Error getting {} from session", PAGE_CODE);
-			e.printStackTrace();
+
 			return null;
 		}
 	}
 
 	public static void setSessionPageCode(HttpServletRequest request, String pageCode) {
-
 		try {
-			request.getSession().setAttribute(PAGE_CODE, pageCode);
-		}catch (Exception e) {
-			log.error("Error set session pageCode");
-			e.printStackTrace();
+			request.getSession(false).setAttribute(PAGE_CODE, pageCode);
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
 	}
 
@@ -146,6 +153,9 @@ public class SessionUtil {
 	}
 
 	public static void setUserInRequest(HttpServletRequest request, User authenticatedUser) {
+		if (null == authenticatedUser) {
+			return;
+		}
 		String requestId = getPageRequestId(request);
 		authenticatedUser.setRequestId(requestId);
 		request.setAttribute(ATTR_USER, authenticatedUser);

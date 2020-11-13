@@ -3,129 +3,126 @@ body {
 	background-position: center;
 	background-size: cover;
 	background-repeat: no-repeat;
-	margin:0;
-	background-color: teal;
-	width:100%;
+	margin: 0;
+	width: 100%;
 	height: 100%
 }
 
-
-#loading-div{
-
-	position:fixed;
-		margin:auto
+#main-header {
+	z-index: 3;
 }
 
-
-.container {
+#loading-div {
+	position: fixed;
 	margin: auto;
-	width: 80%;
-	height: auto;
-	/*  border: solid 1px; */
-	padding:0;
-	background-color: white
+	width: 100%;
+	text-align: center;
 }
 
-a :hover{
-	cursor:pointer;
+.loader {
+	border: 16px solid #f3f3f3; /* Light grey */
+	border-top: 16px solid #3498db; /* Blue */
+	border-radius: 50%;
+	width: 120px;
+	height: 120px;
+	animation: spin 2s linear infinite;
+}
+
+@
+keyframes spin { 0% {
+	transform: rotate(0deg);
+}
+
+100%
+{
+transform
+:
+ 
+rotate
+(360deg);
+ 
+}
+}
+.app_container {
+	/*  border: solid 1px; */
+	padding: 0;
+	background-color: white;
+	min-height: 100vh;
+}
+
+a:hover {
+	cursor: pointer;
+	color: #cccccc;
+	color: inherit;
+}
+
+.header-a:hover {
+	cursor: pointer;
+	color: inherit;
+}
+
+.welcoming-h1 {
+	
+}
+
+.welcoming-h1:hover {
+	background-color: rgba(200, 200, 200, 0.5);
+}
+
+.content-wrapper {
+	
 }
 
 .header {
 	width: 100%;
 	height: 100px;
-	margin:0;
-	padding:0;/* 
+	margin: 0;
+	padding: 0;
+	height: 15vh;
+	/*
 	border: solid 1px; */
 }
 
 .footer {
-	width: 100%; 
-	margin:0;
-	padding:0;
+	width: 100%;
+	margin: 0;
+	padding: 20px;
+	height: 15vh;
 	/*  border: solid 1px; */
 }
 
-.login-form {
-	font-size: 20px;
-	font-family: monospace;
-	text-align: left;
-	/* border-radius: 30px; */
-	left: 25%;
-	padding: 20px;
-	background-color: rgba(255, 255, 255, 0.6);
-	color: black;
-}
-
-
-
-.wrapper-login-form {
-	margin-left: 65%;
-	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0
-		rgba(0, 0, 0, 0.19);
-	text-align: center;
-	margin-right: 10%;
-	margin-bottom: 10%;
-	
-}
-
-.box-shadow{
+.box-shadow {
 	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0
 		rgba(0, 0, 0, 0.19);
 }
 
-/**CRUD**/
-#entity-input-form {
-	/* margin:auto;
-	height:70%;
-	width:60%;
-	position:fixed;
-	background-color: white;
-	
-	text-align: left;
-	padding:20px; */
-	 
-}
-
-.box-shadow{
+.box-shadow {
 	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0
 		rgba(0, 0, 0, 0.19);
 	z-index: 2;
 }
 
-.entity-record{
-	transition-duration: 500ms;
-}
-
-.entity-record:hover{
-	cursor: pointer;
-	background-color: olive;
-	color:white;
-}
-
 /******* COMMON **********/
-
-.clickable:hover{
+.clickable:hover {
 	cursor: pointer;
-	background-color: gray;
+	background-color: #cccccc;
 }
 
-.center-aligned{
+.center-aligned {
 	text-align: center;
 }
 
-.left-aligned{
+.left-aligned {
 	text-align: left;
 }
 
 /******MENUS*******/
- 
-ul#menu-1 li{
+ul#menu-1 li {
 	display: inline;
 }
 
 /******* REPORT *******/
-
 .chart-item-hr {
-	
-	margin:5px; height: 15px;
+	margin: 5px;
+	height: 15px;
 }

@@ -27,6 +27,12 @@
 	</bean>
 	<bean id="DEFAULT_USER_PWD" class="java.lang.String">
 		<constructor-arg value="123" />
+	</bean>
+	<bean id="DEFAULT_SUPER_ADMIN_USER_NAME" class="java.lang.String">
+		<constructor-arg value="superadmin" />
+	</bean>
+	<bean id="DEFAULT_SUPER_ADMIN_USER_PWD" class="java.lang.String">
+		<constructor-arg value="123" />
 
 	</bean>
 	<bean id="APP_CODE" class="java.lang.String">
@@ -105,12 +111,25 @@
 		<property name="password" ref="DEFAULT_USER_PWD"></property>
 		<property name="displayName" value="Default User"></property>
 	</bean>
+	
+	<bean id="config_defaultSuperAdminUser"
+		class="com.fajar.entitymanagement.entity.User">
+		<property name="username" ref="DEFAULT_SUPER_ADMIN_USER_NAME"></property>
+		<property name="password" ref="DEFAULT_SUPER_ADMIN_USER_PWD"></property>
+		<property name="displayName" value="Default User"></property>
+	</bean>
 
 	<bean id="config_defaultUserRole"
 		class="com.fajar.entitymanagement.entity.UserRole">
 		<property name="code" value="00"></property>
 		<property name="name" value="Default Role"></property>
 		<property name="access" value="00"></property>
+	</bean>
+	<bean id="config_superAdminUserRole"
+		class="com.fajar.entitymanagement.entity.UserRole">
+		<property name="code" value="SYSTEM"></property>
+		<property name="name" value="Super Admin"></property>
+		<property name="access" value="1"></property>
 	</bean>
 
 	<bean id="config_defaultProfile"
@@ -135,6 +154,8 @@
 		<property name="appCode" ref="APP_CODE"></property>
 		<property name="DEFAULT_USER_NAME" ref="DEFAULT_USER_NAME"></property>
 		<property name="DEFAULT_USER_PWD" ref="DEFAULT_USER_PWD"></property>
+		<property name="DEFAULT_SUPER_ADMIN_USER_NAME" ref="DEFAULT_SUPER_ADMIN_USER_NAME"></property>
+		<property name="DEFAULT_SUPER_ADMIN_USER_PWD" ref="DEFAULT_SUPER_ADMIN_USER_PWD"></property>
 
 		<property name="uploadedImageRealPath"
 			value="D:/Development/Files/Web/Shop1/Images"></property>
@@ -148,7 +169,9 @@
 			ref="config_defaultPageManagementMenu"></property>
 		<property name="defaultSettingPage" ref="config_defaultSettingPage"></property>
 		<property name="defaultUser" ref="config_defaultUser"></property>
+		<property name="defaultSuperAdminUser" ref="config_defaultSuperAdminUser"></property>
 		<property name="defaultUserRole" ref="config_defaultUserRole"></property>
+		<property name="defaultSuperAdminUserRole" ref="config_superAdminUserRole"></property>
 		<property name="defaultProfile" ref="config_defaultProfile"></property>
 		<property name="defaultManagementPage" ref="config_defaultManagementPage"></property>
 		<property name="defaultAboutPage" ref="config_defaultAboutPage"></property>

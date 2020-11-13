@@ -1,0 +1,21 @@
+#filter-wrapper {
+	position: fixed;
+	 
+/* 	background-color: #ccc; */
+	height: auto;
+/* 	width: 40%; */
+	width: 55px;
+	transition-duration: 300;
+	right: 0;
+	top: 15vh;
+	z-index: 6;
+}
+
+.btn-filter-toggle{
+	
+	transform: rotate(90deg);
+	width: max-content;
+}
+.content-dashboard{
+	padding: 20px;
+}

@@ -155,7 +155,7 @@ public class BaseEntity implements Serializable {
 
 	@JsonIgnore
 	@Transient
-	public EntityUpdateInterceptor getUpdateInterceptor() {
+	public EntityUpdateInterceptor modelUpdateInterceptor() {
 		return new EntityUpdateInterceptor<BaseEntity>() {
 			private static final long serialVersionUID = 2878932467536346251L;
 

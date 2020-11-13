@@ -14,6 +14,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,8 +30,8 @@ import com.fajar.entitymanagement.repository.MenuRepository;
 import com.fajar.entitymanagement.repository.PageRepository;
 import com.fajar.entitymanagement.repository.UserRepository;
 import com.fajar.entitymanagement.repository.UserRoleRepository;
+import com.fajar.entitymanagement.service.entity.EntityValidation;
 import com.fajar.entitymanagement.util.CollectionUtil;
-import com.fajar.entitymanagement.util.EntityUtil;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WebConfigService {
 
 	public static final String DEFAULT_ROLE = "00";
+	public static final String DEFAULT_SUPER_ADMIN_ROLE = "SYSTEM";
 	public static final String SETTING = "setting";
 	public static final String MENU = "menu";
 	public static final String PAGE = "page";
@@ -74,39 +76,55 @@ public class WebConfigService {
 	private String appCode;
 	private String DEFAULT_USER_NAME;
 	private String DEFAULT_USER_PWD;
-	
+	private String DEFAULT_SUPER_ADMIN_USER_NAME;
+	private String DEFAULT_SUPER_ADMIN_USER_PWD;
+
 	private Menu defaultMenuManagementMenu, defaultPageManagementMenu;
 	private Page defaultSettingPage, defaultManagementPage, defaultAdminPage, defaultAboutPage;
 	private User defaultUser;
 	private UserRole defaultUserRole;
+	private UserRole defaultSuperAdminUserRole;
 	private Profile defaultProfile;
 	/////////////////////////////////////////////////////////////
 
 	private List<JpaRepository<?, ?>> jpaRepositories = new ArrayList<>();
 	private List<Type> entityClassess = new ArrayList<>();
 	private Map<Class<? extends BaseEntity>, JpaRepository> repositoryMap = new HashMap<>();
-	
-	
+	private User defaultSuperAdminUser;
+
 	@PostConstruct
 	public void init() {
 		log.info("WebConfigService INITIALIZE");
-		
+
 		LogProxyFactory.setLoggers(this);
-		
+
 		getJpaReporitoriesBean();
 		checkUser();
+		checkSuperAdminUser();
 		checkDefaultProfile();
 		checkDefaultPages();
 	}
 
 	private void checkDefaultPages() {
-		 
+
 		defaultAdminPage();
 		defaultAboutPage();
 	}
 
 	private Page defaultAboutPage() {
 		return getPage(ABOUT, defaultAboutPage);
+	}
+	
+	private void checkSuperAdminUser() {
+		UserRole userRole = userRoleRepository.findByCode(DEFAULT_SUPER_ADMIN_ROLE);
+		if (null == userRole) {
+			userRole = defaultSuperAdminRole();
+		}
+		log.debug("DEFAULT_SUPER_ADMIN_USER_NAME: {}", DEFAULT_SUPER_ADMIN_USER_NAME);
+		User user = userRepository.findByUsername(DEFAULT_SUPER_ADMIN_USER_NAME);
+		if (null == user) {
+			user = defaultSuperAdminUser();
+		}
 	}
 
 	private void checkUser() {
@@ -126,8 +144,20 @@ public class WebConfigService {
 			return user;
 		}
 		user = defaultUser;
-		user.setRole(defaultRole());  
+		user.setRole(defaultRole());
+
+		return userRepository.save(user);
+	}
+	private User defaultSuperAdminUser() {
+		log.debug("DEFAULT_SUPER_ADMIN_USER_NAME: {}", DEFAULT_SUPER_ADMIN_USER_NAME);
 		
+		User user = userRepository.findByUsername(DEFAULT_SUPER_ADMIN_USER_NAME);
+		if (null != user) {
+			return user;
+		}
+		user = defaultSuperAdminUser;
+		user.setRole(defaultSuperAdminRole());
+
 		return userRepository.save(user);
 	}
 
@@ -137,6 +167,15 @@ public class WebConfigService {
 			return userRole;
 		}
 		userRole = defaultUserRole;
+
+		return userRoleRepository.save(userRole);
+	}
+	public UserRole defaultSuperAdminRole() {
+		UserRole userRole = userRoleRepository.findByCode(DEFAULT_SUPER_ADMIN_ROLE);
+		if (null != userRole) {
+			return userRole;
+		}
+		userRole = defaultSuperAdminUserRole;
 
 		return userRoleRepository.save(userRole);
 	}
@@ -176,7 +215,7 @@ public class WebConfigService {
 	public Profile getProfile() {
 		return checkDefaultProfile();
 	}
-	
+
 	public Menu getMenu(String code, Menu defaultMenuIfNotExist, Page menuPage) {
 		Page eixsitingPage = getPage(menuPage.getCode(), menuPage);
 		Menu menu = menuRepository.findByCode(code);
@@ -187,12 +226,12 @@ public class WebConfigService {
 
 		log.info("WILL SAVE menu with :{}", code);
 
-		menu = defaultMenuIfNotExist; 
-		menu.setMenuPage(eixsitingPage); 
+		menu = defaultMenuIfNotExist;
+		menu.setMenuPage(eixsitingPage);
 
 		return menuRepository.save(menu);
 	}
-	
+
 	public Menu checkDefaultMenu() {
 		return getMenu(MENU, defaultMenuManagementMenu, defaultSettingPage());
 	}
@@ -200,7 +239,7 @@ public class WebConfigService {
 	public Menu checkPageManagementMenu() {
 		return getMenu(PAGE, defaultPageManagementMenu, defaultSettingPage());
 	}
-	
+
 	private Page getPage(String code, Page defaultPageIfNotExist) {
 		Page page = pageRepository.findByCode(code);
 		if (null != page) {
@@ -210,25 +249,70 @@ public class WebConfigService {
 		log.info("WILL SAVE page : {}...", code);
 		return pageRepository.save(defaultPageIfNotExist);
 	}
-	 
+
 	public Page defaultAdminPage() {
 		return getPage(ADMIN, defaultAdminPage);
 	}
-	
+
 	public Page defaultSettingPage() {
-		
+
 		return getPage(SETTING, defaultSettingPage);
-		 
+
 	}
 
+	static final Object[] names = new Object[] { "A1", "B2", "C3", "D4", "E5", "F6", "G7" };
+	static final Object[] DAYS = new Object[] { "Sen ", "Sel ", "Rab ", "Kam ", "JUm ", "Sab ", "Min " };
+
+	static int suffleCount = 0;
+
 	public static void main(String[] args) throws IOException {
-//		Class _class = ProductRepository.class;
-//		Type[] interfaces = _class.getGenericInterfaces();
-//		CollectionUtil.printArray(interfaces);
-//		Type type = interfaces[0];
-//		System.out.println("type: "+type);
-//		ParameterizedType parameterizedType = (ParameterizedType) type;
-//		log.info("parameterizedType: {}", parameterizedType );
+		String Dayparams = StringUtils.repeat("{}    ", DAYS.length);
+		log.info(Dayparams, DAYS);
+		for (int i = 0; i < 50; i++) {
+//			System.out.println(suffleCount);
+			String params = StringUtils.repeat("{} {} | ", 7);
+
+			log.info(params, suffle());
+		}
+
+	}
+
+	static boolean sufflePaused = false;
+
+	static Object[] suffle() {
+		if (!sufflePaused)
+			suffleCount++;
+
+		if (suffleCount > 4) {
+			suffleCount = 0;
+		}
+//		System.out.println("suffleCount: "+suffleCount);
+		Object[] result = new Object[14];
+		for (int i = 0; i < 5; i++) {
+
+			int newIndex = i + suffleCount;
+
+			if (newIndex > 4) {
+				newIndex = newIndex - 5;
+				sufflePaused = true;
+			}
+			if (sufflePaused && i == 4) {
+				sufflePaused = false;
+			}
+//			System.out.println(newIndex+"vs"+i);
+//			System.out.println( result[newIndex]+" "+ names[i]);
+			result[i * 2] = names[newIndex];// + "_" + newIndex;
+			int nextIdx = i * 2 + 3;
+			if(nextIdx > 9) {
+				nextIdx = 1;
+			}
+			result[nextIdx] = names[newIndex];
+		}
+		result[10] = names[5];
+		result[11] = names[6];
+		result[12] = names[5];
+		result[13] = names[6];
+		return result;
 	}
 
 	private ParameterizedType getJpaRepositoryType(Class<?> _class) {
@@ -297,9 +381,8 @@ public class WebConfigService {
 		}
 		dbProfile = ProfileRepository.findByAppCode(appCode);
 
-		/* return getProfileFromSession(); */ return EntityUtil.validateDefaultValue(dbProfile);
+		/* return getProfileFromSession(); */ return EntityValidation.validateDefaultValue(dbProfile, null);
 	}
- 
 
 	public <T extends BaseEntity> JpaRepository getJpaRepository(Class<T> _entityClass) {
 		log.info("get JPA Repository for: {}", _entityClass);

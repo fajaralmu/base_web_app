@@ -16,5 +16,6 @@ public interface PageRepository extends JpaRepository<Page, Long> {
 	Page findTop1ByLink(String link);
 
 	List<Page> findByOrderBySequenceAsc();
+	List<Page> findByAuthorizedOrderBySequenceAsc(int i);
 
 }

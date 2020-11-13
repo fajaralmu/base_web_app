@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.fajar.entitymanagement.entity.ProductCategory;
+import com.fajar.entitymanagement.entity.Category;
 
-public interface ProductCategoryRepository extends JpaRepository<ProductCategory, Long> {
+public interface ProductCategoryRepository extends JpaRepository<Category, Long> {
 
-	List<ProductCategory> findByDeletedFalse();
+	List<Category> findByDeletedFalse();
 
 }

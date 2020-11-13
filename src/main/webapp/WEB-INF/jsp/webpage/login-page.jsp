@@ -10,8 +10,8 @@
 	var ctxPath = "${contextPath}";
 	function login() {
 
-		var username = _byId("user-name").value;
-		var password = _byId("password").value;
+		var username = byId("user-name").value;
+		var password = byId("password").value;
 		var request = new XMLHttpRequest();
 		infoLoading();
 		var requestObject = {
@@ -47,18 +47,24 @@
 		<div class="card-header">Please Login</div>
 		<div class="card-body">
 			<div class="login-form">
-			
-				<label for="user-name">Username</label>
-				<input id="user-name"
-					class="form-control" type="text" />
-				<label for="password">Password</label> 
-				<input id="password" type="password" class="form-control" />
-				 
-				<button class="btn btn-primary" onclick="login(); return false;">Login</button> 
-				<a role="button" class="btn btn-success"
-					href='<spring:url value="/account/register"></spring:url>'>Register</a>  
-
+				<div class="input-group mb-3">
+					<div class="input-group-prepend">
+						<span class="input-group-text"><i class="fa fa-user-circle"></i></span>
+					</div>
+					<input placeholder="username" id="user-name" class="form-control" type="text" />
+				</div>
+				<div class="input-group mb-3">
+					<div class="input-group-prepend">
+						<span class="input-group-text"> <i class="fa fa-lock"></i></span>
+					</div>
+					<input placeholder="password" id="password" type="password" class="form-control" />
+				</div> 
 			</div>
+		</div>
+		<div class="card-footer">
+			<button onclick="login()" id="btn-login" class="btn btn-primary"  >Login</button>
+			<a role="button" class="btn btn-success"
+				href='<spring:url value="/account/register"></spring:url>'>Register</a>
 		</div>
 	</div>
 </div>

@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fajar.entitymanagement.annotation.Authenticated;
 import com.fajar.entitymanagement.dto.WebRequest;
 import com.fajar.entitymanagement.dto.WebResponse;
-import com.fajar.entitymanagement.service.EntityService;
 import com.fajar.entitymanagement.service.LogProxyFactory;
+import com.fajar.entitymanagement.service.entity.EntityService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,7 +60,7 @@ public class RestEntityController extends BaseController{
 	public WebResponse get(@RequestBody WebRequest request, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse) throws IOException {
 		log.info("get entity {}", request); 
-		return entityService.filter(request );
+		return entityService.filter(request, httpRequest );
 		 
 	}
 	

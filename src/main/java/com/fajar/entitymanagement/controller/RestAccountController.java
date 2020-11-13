@@ -17,6 +17,7 @@ import com.fajar.entitymanagement.annotation.Authenticated;
 import com.fajar.entitymanagement.annotation.CustomRequestInfo;
 import com.fajar.entitymanagement.dto.WebRequest;
 import com.fajar.entitymanagement.dto.WebResponse;
+import com.fajar.entitymanagement.entity.User;
 import com.fajar.entitymanagement.service.LogProxyFactory;
 
 import lombok.extern.slf4j.Slf4j;
@@ -57,18 +58,19 @@ public class RestAccountController extends BaseController {
 	public WebResponse logout(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
 
 		boolean success = false;
-		if (userSessionService.hasSession(httpRequest, false)) {
+		if (sessionValidationService.hasSession(httpRequest, false)) {
 			success = accountService.logout(httpRequest);
 		}
 
 		return WebResponse.builder().code(success ? "00" : "01").message("SUCCESS LOGOUT: " + success).build();
 	}
 
-	@PostMapping(value = "/getprofile", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = {"/getprofile", "/user"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Authenticated
-	public WebResponse getprpfile(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
+	public User getprpfile(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
 
-		return userSessionService.getProfile(httpRequest);
+		return userSessionService.getLoggedUser(httpRequest);
 	}
+	 
 
 }

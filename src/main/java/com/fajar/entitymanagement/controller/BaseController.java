@@ -16,18 +16,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fajar.entitymanagement.dto.KeyPair;
+import com.fajar.entitymanagement.dto.KeyValue;
 import com.fajar.entitymanagement.entity.Page;
 import com.fajar.entitymanagement.entity.Profile;
 import com.fajar.entitymanagement.entity.User;
 import com.fajar.entitymanagement.service.ComponentService;
-import com.fajar.entitymanagement.service.RuntimeService;
 import com.fajar.entitymanagement.service.UserAccountService;
-import com.fajar.entitymanagement.service.UserSessionService;
 import com.fajar.entitymanagement.service.WebConfigService;
+import com.fajar.entitymanagement.service.runtime.RuntimeService;
+import com.fajar.entitymanagement.service.sessions.RegisteredRequestService;
+import com.fajar.entitymanagement.service.sessions.SessionValidationService;
+import com.fajar.entitymanagement.service.sessions.UserSessionService;
+import com.fajar.entitymanagement.util.ApplicationUtil;
 import com.fajar.entitymanagement.util.DateUtil;
 import com.fajar.entitymanagement.util.MvcUtil;
-import com.fajar.entitymanagement.util.SessionUtil;
+import com.fajar.entitymanagement.util.SessionUtil; 
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,17 +45,26 @@ public class BaseController {
 	@Autowired
 	protected UserSessionService userSessionService;
 	@Autowired
+	protected SessionValidationService sessionValidationService;
+	@Autowired
 	protected UserAccountService accountService;
 	@Autowired
-	protected RuntimeService registryService;
-	@Autowired
-	protected UserSessionService userService;
+	protected RuntimeService registryService;  
 	@Autowired
 	protected ComponentService componentService;
+	@Autowired
+	protected RegisteredRequestService registeredRequestService;
+
+	@ModelAttribute("shopProfile")
+	@Deprecated // new @ModelAttribute = 'profile'
+	public Profile getShopProfile(HttpServletRequest request) {
+//		System.out.println("Has Session: "+userSessionService.hasSession(request, false));
+		return webAppConfiguration.getProfile();
+	}
 
 	@ModelAttribute("profile")
 	public Profile getProfile(HttpServletRequest request) {
-		return webAppConfiguration.getProfile();
+		return getShopProfile(request);
 	}
 
 	@ModelAttribute("timeGreeting")
@@ -62,10 +74,29 @@ public class BaseController {
 
 	@ModelAttribute("loggedUser")
 	public User getLoggedUser(HttpServletRequest request) {
-		if (userSessionService.hasSession(request, false)) {
+		if (sessionValidationService.hasSession(request, false)) {
 			return userSessionService.getUserFromSession(request);
 		} else
 			return null;
+	}
+
+	@ModelAttribute("ipv4Address")
+	public String getIpv4Address(HttpServletRequest request) {
+		return ApplicationUtil.getIpv4Address();
+	}
+
+	@ModelAttribute("pageIconUrl")
+	public String iconUrl(HttpServletRequest request) {
+		Profile Profile = webAppConfiguration.getProfile();
+
+		String icon;
+		if (null != Profile.getPageIcon()) {
+			icon = "/WebAsset/Shop1/Images/ICON/" + Profile.getPageIcon();
+		} else {
+			icon = "/res/img/javaEE.ico";
+		}
+
+		return icon;
 	}
 
 	@ModelAttribute("host")
@@ -90,14 +121,23 @@ public class BaseController {
 
 	@ModelAttribute("pageToken")
 	public String pageToken(HttpServletRequest request) {
-		return userSessionService.getToken(request);
+		try {
+			return sessionValidationService.getTokenByServletRequest(request);
+		} catch (Exception e) {
+			return "";
+		}
 	}
 
 	@ModelAttribute("requestId")
 	public String getPublicRequestId(HttpServletRequest request) {
-		Cookie cookie = getCookie(SessionUtil.JSESSSIONID, request.getCookies());
-		String cookieValue = cookie == null ? UUID.randomUUID().toString() : cookie.getValue();
-		return registryService.addPageRequest(cookieValue);
+		try {
+			Cookie cookie = getCookie(SessionUtil.JSESSSIONID, request.getCookies());
+			String cookieValue = cookie == null ? UUID.randomUUID().toString() : cookie.getValue();
+			return registryService.addPageRequest(cookieValue);
+		} catch (Exception e) {
+
+			return "";
+		}
 
 	}
 
@@ -113,25 +153,19 @@ public class BaseController {
 		return componentService.getPages(request);
 	}
 
-	@ModelAttribute("year") /// required in the footer
+	@ModelAttribute("year")
 	public int getCurrentYear(HttpServletRequest request) {
 		return DateUtil.getCalendarItem(new Date(), Calendar.YEAR);
 	}
 
-	public String activePage(HttpServletRequest request) {
-		return userSessionService.getPageCode(request);
+	@ModelAttribute("authenticated")
+	public boolean authenticated(HttpServletRequest request) {
+		return sessionValidationService.hasSession(request);
 	}
 
-	public void setActivePage(HttpServletRequest request) {
-
-		String pageCode = componentService.getPageCode(request);
-		userSessionService.setActivePage(request, pageCode);
-	}
-
-	public void setActivePage(HttpServletRequest request, String pageCode) {
-
-		userSessionService.setActivePage(request, pageCode);
-	}
+//	public String activePage(HttpServletRequest request) {
+//		return userSessionService.getPageCode(request);
+//	}
 
 	/**
 	 * ====================================================== Statics
@@ -147,9 +181,14 @@ public class BaseController {
 				}
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error("ERROR GET COOKIE NAME: {}", name);
 		}
 		return null;
+	}
+
+	public static Cookie getJSessionIDCookie(HttpServletRequest request) {
+
+		return getCookie(SessionUtil.JSESSSIONID, request.getCookies());
 	}
 
 	/**
@@ -178,10 +217,12 @@ public class BaseController {
 	}
 
 	private static void addResourcePaths(ModelAndView modelAndView, String resourceName, String... paths) {
-		List<KeyPair<Object, String>> resoucePaths = new ArrayList<>();
+		List<KeyValue<String, String>> resoucePaths = new ArrayList<>();
 		for (int i = 0; i < paths.length; i++) {
-			KeyPair<Object, String> keyPair = new KeyPair<Object, String>(i, paths[i], true);
-			resoucePaths.add(keyPair);
+			KeyValue<String, String> keyValue = new KeyValue<String, String>();
+			keyValue.setValue(paths[i]);
+
+			resoucePaths.add(keyValue);
 			log.info("{}. Add {} to {} , value: {}", i, resourceName, modelAndView.getViewName(), paths[i]);
 		}
 		setModelAttribute(modelAndView, resourceName, resoucePaths);
@@ -221,10 +262,5 @@ public class BaseController {
 		}
 		setModelAttribute(modelAndView, "pageUrl", pageUrl);
 
-	}
-
-	public static Cookie getJSessionIDCookie(HttpServletRequest request) {
-
-		return getCookie(SessionUtil.JSESSSIONID, request.getCookies());
 	}
 }

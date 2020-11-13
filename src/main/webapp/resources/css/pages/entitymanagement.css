@@ -17,3 +17,13 @@
 	border: solid 1px gray;
 	border-radius: 15px;
 }
+
+.entity-record {
+	transition-duration: 500ms;
+}
+
+.entity-record:hover {
+	cursor: pointer;
+	background-color: olive;
+	color: white;
+}

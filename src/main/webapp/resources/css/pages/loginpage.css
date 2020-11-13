@@ -1,13 +1,9 @@
 .login-form {
-	
+	font-size: 20px; 
 	text-align: left;
-	/* border-radius: 30px; */ 
+	/* border-radius: 30px; */
+	left: 25%;
 	padding: 20px;
 	background-color: rgba(255, 255, 255, 0.6);
 	color: black;
-	display: grid;
-	grid-template-columns: 40% 50%;
-	grid-column-gap: 5px;
-	grid-row-gap: 5px;
 }
-  

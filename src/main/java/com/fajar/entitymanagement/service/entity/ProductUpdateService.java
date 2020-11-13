@@ -1,6 +1,6 @@
 package com.fajar.entitymanagement.service.entity;
 
-import static com.fajar.entitymanagement.service.EntityService.ORIGINAL_PREFFIX;
+import static com.fajar.entitymanagement.service.entity.EntityService.ORIGINAL_PREFFIX;
 
 import java.io.IOException;
 import java.util.List;

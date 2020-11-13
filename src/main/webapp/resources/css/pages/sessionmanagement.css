@@ -1,0 +1,7 @@
+.chat-item-admin{
+	border-radius:4px; margin:2px;padding:3px;  background-color: cadetblue
+}
+
+.chat-item-client{
+	border-radius:4px; margin:2px;padding:3px; background-color: wheat
+}

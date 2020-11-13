@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fajar.entitymanagement.annotation.Authenticated;
 import com.fajar.entitymanagement.annotation.CustomRequestInfo;
+import com.fajar.entitymanagement.entity.Page;
 import com.fajar.entitymanagement.service.LogProxyFactory;
+import com.fajar.entitymanagement.util.EntityUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,18 +46,22 @@ public class MvcAdminController extends BaseController {
 
 //		model.addAttribute("menus", componentService.getDashboardMenus(request));
 		model.addAttribute("imagePath", webAppConfiguration.getUploadedImagePath());
-		model.addAttribute("page", "admin"); 
-		setActivePage(request, "admin");
+		model.addAttribute("page", "admin");  
 		return basePage;
 	}
 	
-	@RequestMapping(value = { "/pagesequencesetting" })
-	@CustomRequestInfo(title = "Menu Sequence", pageUrl = "webpage/page-sequence", stylePaths = { "pagesequence" })
-	public String pageSequenceSetting(Model model, HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	 
+	@RequestMapping(value = { "/sidemenudisplayorder" })
+	@CustomRequestInfo(title = "Menu Sequence Order", pageUrl = "webpage/sequenceordering", stylePaths = {
+			"sequenceordering" })
+	public String sideMenuDisplayOrder(Model model, HttpServletRequest request, HttpServletResponse response) {
 
-		model.addAttribute("pages", componentService.getAllPages());
-		setActivePage(request, "admin");
+//		model.addAttribute("pages", componentService.getAllPages());
+		model.addAttribute("idField", EntityUtil.getIdFieldOfAnObject(Page.class).getName());
+		model.addAttribute("displayField", "name");
+		model.addAttribute("entityName", "page");
+		model.addAttribute("withAdditionalSetting", true);
+		model.addAttribute("resetSequenceLink", "/account/websetting?action=resetmenu"); 
 		return basePage;
 
 	}

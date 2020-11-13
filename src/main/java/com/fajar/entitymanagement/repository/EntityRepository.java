@@ -23,15 +23,14 @@ import com.fajar.entitymanagement.entity.setting.EntityManagementConfig;
 import com.fajar.entitymanagement.service.WebConfigService;
 import com.fajar.entitymanagement.service.entity.BaseEntityUpdateService;
 import com.fajar.entitymanagement.service.entity.EntityUpdateInterceptor;
+import com.fajar.entitymanagement.util.CollectionUtil;
 import com.fajar.entitymanagement.util.EntityUtil;
-import com.fajar.entitymanagement.util.StringUtil;
 
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
 @Service
 @Slf4j
 @Data
@@ -41,9 +40,10 @@ public class EntityRepository {
 	private WebConfigService webConfigService;
 
 	@Autowired
-	private RepositoryCustomImpl repositoryCustom;
+	private CustomRepositoryImpl customRepository;
 	@Autowired
-	private ApplicationContext applicationContext;
+	private ApplicationContext applicationContext; 
+	 
 
 	@Setter(value = AccessLevel.NONE)
 	@Getter(value = AccessLevel.NONE)
@@ -64,7 +64,7 @@ public class EntityRepository {
 
 	@PostConstruct
 	public void init() throws Exception {
-		putEntitiesConfig();
+		putEntitiesConfig(); 
 	}
 
 	private void putEntitiesConfig() throws Exception {
@@ -78,13 +78,14 @@ public class EntityRepository {
 				if (null == dtoInfo) {
 					continue;
 				}
-				Class<? extends BaseEntityUpdateService> updateServiceClass = dtoInfo.updateService();
-				String beanName = StringUtil.lowerCaseFirstChar(updateServiceClass.getSimpleName());
+//				Class<? extends BaseEntityUpdateService> updateServiceClass = dtoInfo.updateService();
+				String beanName = dtoInfo.updateService();
+//				String beanName = StringUtil.lowerCaseFirstChar(updateServiceClass.getSimpleName());
 
 				BaseEntityUpdateService updateServiceBean = (BaseEntityUpdateService) applicationContext
 						.getBean(beanName);
 				EntityUpdateInterceptor updateInterceptor = ((BaseEntity) entityClass.newInstance())
-						.getUpdateInterceptor();
+						.modelUpdateInterceptor();
 
 				log.info("Registering entity config: {}, updateServiceBean: {}", entityClass.getSimpleName(),
 						updateServiceBean);
@@ -145,11 +146,16 @@ public class EntityRepository {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw ex;
+		} finally {
+			//databaseProcessorNotifier.refresh();
 		}
 	}
 
 	public <T extends BaseEntity> T savev2(T entity) {
-		return repositoryCustom.saveObject(entity);
+		DatabaseProcessor databatseProcessor = customRepository.createDatabaseProcessor();
+		T result = databatseProcessor.saveObject(entity); 
+		databatseProcessor.refresh();
+		return result;
 
 	}
 
@@ -234,6 +240,12 @@ public class EntityRepository {
 		log.debug("{} is NULL", clazz.getSimpleName());
 		return null;
 	}
+	
+//	public <ID extends Serializable, T extends BaseEntity> T findByIdv2(Class<T> _class, ID id) {
+//		T result = databaseReader.getById(_class, id);
+//		
+//		return result;
+//	}
 
 	/**
 	 * find all entity
@@ -244,7 +256,7 @@ public class EntityRepository {
 	public <T extends BaseEntity> List<T> findAll(Class<T> clazz) {
 		JpaRepository repository = findRepo(clazz);
 		if (repository == null) {
-			return new ArrayList<>();
+			return CollectionUtil.emptyList();
 		}
 		return repository.findAll();
 	}
@@ -258,12 +270,19 @@ public class EntityRepository {
 	 */
 	public <T extends BaseEntity> boolean deleteById(Long id, Class<T> class1) {
 		log.info("Will delete entity: {}, id: {}", class1.getClass(), id);
-		return repositoryCustom.deleteObjectById(class1, id);
+		DatabaseProcessor databatseProcessor = customRepository.createDatabaseProcessor();
+		return databatseProcessor.deleteObjectById(class1, id);
 
 	}
 
 	public EntityManagementConfig getConfiguration(String key) {
 		return this.entityConfiguration.get(key);
+	}
+
+	public List findByKey(Class entityClass, Field idField, Object... objectArray) {
+		 
+		DatabaseProcessor databatseProcessor = customRepository.createDatabaseProcessor();
+		return databatseProcessor.findByKeyAndValues(entityClass,idField.getName() , objectArray);
 	}
 
 }

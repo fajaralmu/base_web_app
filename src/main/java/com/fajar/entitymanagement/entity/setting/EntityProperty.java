@@ -29,23 +29,27 @@ public class EntityProperty implements Serializable {
 	/**
 	* 
 	*/
-	private static final long serialVersionUID = 2648801606702528928L; 
-	
+	private static final long serialVersionUID = 2648801606702528928L;
+
+	@Setter(value = AccessLevel.NONE)
+	private String groupNames;
 	private String entityName;
 	private String alias;
 	private String fieldNames;
-
 	private String idField;
+	private String detailFieldName;
+	
+
+	private String imageElementsJson;
+	private String dateElementsJson;
+	private String multipleSelectElementsJson;
+	private String currencyElementsJson;
+
 	private int formInputColumn;
 	@Builder.Default
 	private boolean editable = true;
 	@Builder.Default
 	private boolean withDetail = false;
-	private String detailFieldName;
-
-	private String imageElementsJson;
-	private String dateElementsJson;
-	private String currencyElementsJson;
 
 	@Builder.Default
 	private List<String> dateElements = new ArrayList<String>();
@@ -53,63 +57,43 @@ public class EntityProperty implements Serializable {
 	private List<String> imageElements = new ArrayList<String>();
 	@Builder.Default
 	private List<String> currencyElements = new ArrayList<String>();
+	@Builder.Default
+	private List<String> multipleSelectElements = new ArrayList<String>();
 	private List<EntityElement> elements;
 	private List<String> fieldNameList;
 
-	private boolean ignoreBaseField; 
+	private boolean ignoreBaseField;
 	private boolean isQuestionare;
-	@Setter(value = AccessLevel.NONE)
-	private String groupNames;
 
 	public void setElementJsonList() {
 
 		this.dateElementsJson = MyJsonUtil.listToJson(dateElements);
 		this.imageElementsJson = MyJsonUtil.listToJson(imageElements);
 		this.currencyElementsJson = MyJsonUtil.listToJson(currencyElements);
+		this.multipleSelectElementsJson = MyJsonUtil.listToJson(multipleSelectElements);
 	}
-
-	public void removeElements(String... fieldNames) {
-		if (this.elements == null)
-			return;
-		for (int i = 0; i < fieldNames.length; i++) {
-			String fieldName = fieldNames[i];
-			loop: for (String fName : fieldNameList) {
-				if (fieldName.equals(fName)) {
-					fieldNameList.remove(fName);
-					break loop;
-				}
-			}
-			loop2: for (EntityElement entityElement : this.elements) {
-				if (entityElement.getId().equals(fieldName)) {
-					this.elements.remove(entityElement);
-					break loop2;
-				}
-			}
-		}
-		this.fieldNames = MyJsonUtil.listToJson(fieldNameList);
-	}
-	
+ 
 	public void setGroupNames(String[] groupNamesArray) {
 		int removedIndex = 0;
 		for (int i = 0; i < groupNamesArray.length; i++) {
-			if(groupNamesArray[i] == AdditionalQuestionField.DEFAULT_GROUP_NAME) {
+			if (groupNamesArray[i] == AdditionalQuestionField.DEFAULT_GROUP_NAME) {
 				removedIndex = i;
 			}
 		}
 		groupNamesArray = ArrayUtils.remove(groupNamesArray, removedIndex);
 		this.groupNames = String.join(",", groupNamesArray);
-		groupNames+=","+AdditionalQuestionField.DEFAULT_GROUP_NAME;
+		groupNames += "," + AdditionalQuestionField.DEFAULT_GROUP_NAME;
 	}
-	
+
 //	static void main(String[] args) {
 //		args =new String[] {"OO", "ff", "fff22"};
 //		for (int i = 0; i < args.length; i++) {
 //			if(args[i] == "OO")
 //		}
 //	}
-
+ 
 	public String getGridTemplateColumns() {
-		if(formInputColumn == 2) {
+		if (formInputColumn == 2) {
 			return "20% 70%";
 		}
 		return StringUtils.repeat("auto ", formInputColumn);
@@ -126,7 +110,5 @@ public class EntityProperty implements Serializable {
 			}
 		}
 	}
-	
-	 
 
 }

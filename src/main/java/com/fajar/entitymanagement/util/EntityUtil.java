@@ -1,5 +1,7 @@
 package com.fajar.entitymanagement.util;
 
+import static com.fajar.entitymanagement.dto.FieldType.FIELD_TYPE_FIXED_LIST;
+
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -23,7 +25,6 @@ import org.apache.commons.lang3.SerializationUtils;
 import com.fajar.entitymanagement.annotation.AdditionalQuestionField;
 import com.fajar.entitymanagement.annotation.Dto;
 import com.fajar.entitymanagement.annotation.FormField;
-import com.fajar.entitymanagement.dto.FieldType;
 import com.fajar.entitymanagement.entity.BaseEntity;
 import com.fajar.entitymanagement.entity.setting.EntityElement;
 import com.fajar.entitymanagement.entity.setting.EntityProperty;
@@ -76,7 +77,8 @@ public class EntityUtil {
 				entityElements.add(entityElement);
 			}
 
-			entityProperty.setAlias(dto.value().isEmpty() ? clazz.getSimpleName() : dto.value());
+			entityProperty
+					.setAlias(dto.value().isEmpty() ? StringUtil.extractCamelCase(clazz.getSimpleName()) : dto.value());
 			entityProperty.setEditable(dto.editable());
 			entityProperty.setElementJsonList();
 			entityProperty.setElements(entityElements);
@@ -97,21 +99,20 @@ public class EntityUtil {
 
 	}
 
-	public static void main(String[] args) {
-//		List<Field> fields = getDeclaredFields(StudentParent.class);
-//		fields = sortListByQuestionareSection(fields);
-//		
-//		for (Field field : fields) {
-//			log.debug("{}", field.getName());
-//		}
-//		
-//		Object[] arrayOfFields = fields.toArray();
-	}
-
 	static boolean isIdField(Field field) {
 		return field.getAnnotation(Id.class) != null;
 	}
 
+	public static void removeAttribute(Object object, String... fields) {
+		for (String fieldName : fields) {
+			Field field = EntityUtil.getDeclaredField(object.getClass(), fieldName);
+
+			try {
+				field.set(object, null);
+			} catch (Exception e) { e.printStackTrace(); }
+		}
+	}
+	
 	/**
 	 * 
 	 * @param _class
@@ -207,12 +208,12 @@ public class EntityUtil {
 			return field;
 
 		} catch (Exception e) {
-			log.error("Error get declared field in the class, and try access super class");
+			//log.error("Error get declared field in the class, and try access super class");
 		}
 		if (clazz.getSuperclass() != null) {
 
 			try {
-				log.info("TRY ACCESS SUPERCLASS");
+				//log.info("TRY ACCESS SUPERCLASS");
 
 				Field superClassField = clazz.getSuperclass().getDeclaredField(fieldName);
 				superClassField.setAccessible(true);
@@ -247,9 +248,9 @@ public class EntityUtil {
 		loop1: for (Field field : baseField) {
 
 			Object column = getFieldAnnotation(field, Column.class);
-			if(onlyColumnField && null == column)
+			if (onlyColumnField && null == column)
 				column = getFieldAnnotation(field, JoinColumn.class);
-			
+
 			if (onlyColumnField && column == null)
 				continue loop1;
 
@@ -262,9 +263,9 @@ public class EntityUtil {
 
 			loop2: for (Field field : parentFields) {
 				Object column = getFieldAnnotation(field, Column.class);
-				if(onlyColumnField && null == column)
+				if (onlyColumnField && null == column)
 					column = getFieldAnnotation(field, JoinColumn.class);
-				
+
 				if (onlyColumnField && column == null)
 					continue loop2;
 
@@ -274,6 +275,16 @@ public class EntityUtil {
 
 		}
 		return fieldList;
+	}
+
+	public static Field getIdFieldOfAnObject(Field field) {
+		Class<?> cls;
+		if (CollectionUtil.isCollectionOfBaseEntity(field)) {
+			cls = (Class<?>) CollectionUtil.getGenericTypes(field)[0];
+		} else {
+			cls = field.getType();
+		}
+		return getIdFieldOfAnObject(cls);
 	}
 
 	public static Field getIdFieldOfAnObject(Class<?> clazz) {
@@ -358,92 +369,15 @@ public class EntityUtil {
 		return targetObject;
 	}
 
-	public static void validateDefaultValues(List<? extends BaseEntity> entities) {
-		for (int i = 0; i < entities.size(); i++) {
-			validateDefaultValue(entities.get(i));
-		}
-	}
-
 	public static boolean isStaticField(Field field) {
 		return Modifier.isStatic(field.getModifiers());
 	}
 
-	public static <T extends BaseEntity> T validateDefaultValue(T baseEntity) {
-		List<Field> fields = EntityUtil.getDeclaredFields(baseEntity.getClass());
-
-		for (Field field : fields) {
-
-			try {
-
-				field.setAccessible(true);
-				FormField formField = field.getAnnotation(FormField.class);
-
-				if (field.getType().equals(String.class) && formField != null
-						&& formField.defaultValue().equals("") == false) {
-
-					Object value = field.get(baseEntity);
-
-					if (value == null || value.toString().equals("")) {
-						field.set(baseEntity, formField.defaultValue());
-					}
-
-				}
-
-				if (formField != null && formField.multiply().length > 1) {
-					Object objectValue = field.get(baseEntity);
-
-					if (objectValue != null)
-						continue;
-
-					Object newValue = "1";
-					String[] multiplyFields = formField.multiply();
-
-					loop: for (String multiplyFieldName : multiplyFields) {
-
-						Field multiplyField = getDeclaredField(baseEntity.getClass(), multiplyFieldName);
-
-						if (multiplyField == null) {
-							continue loop;
-						}
-						multiplyField.setAccessible(true);
-
-						Object multiplyFieldValue = multiplyField.get(baseEntity);
-						String strVal = "0";
-
-						if (multiplyFieldValue != null) {
-							strVal = multiplyFieldValue.toString();
-						}
-
-						if (field.getType().equals(Long.class)) {
-							newValue = Long.parseLong(newValue.toString()) * Long.parseLong(strVal);
-
-						} else if (field.getType().equals(Integer.class)) {
-							newValue = Integer.parseInt(newValue.toString()) * Integer.parseInt(strVal);
-
-						} else if (field.getType().equals(Double.class)) {
-							newValue = Double.parseDouble(newValue.toString()) * Double.parseDouble(strVal);
-						}
-
-					}
-					field.set(baseEntity, newValue);
-
-				}
-			} catch (Exception e) {
-				log.error("Error validating field, will conitnue loop");
-				e.printStackTrace();
-			}
-		}
-		return baseEntity;
-	}
-
-	public static <T extends BaseEntity> List<T> validateDefaultValue(List<T> entities) {
-		for (T baseEntity : entities) {
-			baseEntity = validateDefaultValue(baseEntity);
-		}
-		return entities;
-	}
-
 	public static <T> T getObjectFromListByFieldName(final String fieldName, final Object value, final List<T> list) {
+
+		if (null == list) {
+			return null;
+		}
 
 		for (T object : list) {
 			Field field = EntityUtil.getDeclaredField(object.getClass(), fieldName);
@@ -508,8 +442,9 @@ public class EntityUtil {
 			boolean superClassAvailable = field.getType().getSuperclass() != null;
 			boolean isBaseEntitySubClass = superClassAvailable
 					&& field.getType().getSuperclass().equals(BaseEntity.class);
+			boolean isCollectionOfBaseEntity = CollectionUtil.isCollectionOfBaseEntity(field);
 
-			if (isBaseEntitySubClass && formField.type().equals(FieldType.FIELD_TYPE_FIXED_LIST)) {
+			if ((isBaseEntitySubClass || isCollectionOfBaseEntity) && formField.type().equals(FIELD_TYPE_FIXED_LIST)) {
 				fields.add(field);
 			}
 
@@ -517,6 +452,7 @@ public class EntityUtil {
 		return fields;
 	}
 
+	  
 	public static <T> T castObject(Object o) {
 		try {
 			return (T) o;

@@ -8,10 +8,12 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.connector.RequestFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,6 +51,16 @@ public class RestReportController {
 		File result = excelReportService.generateEntityReport(request, httpRequest);
 		
 		writeFileReponse(httpResponse, result);
+	 
+	}
+	
+	@GetMapping(value = "/hello.js") 
+	public void resources( HttpServletRequest httpRequest,
+			HttpServletResponse httpResponse) throws Exception {
+		//Authentication goes here or using handler interceptor
+		httpResponse.setContentType("text/javascript");
+		httpResponse.setHeader("MIME-type", "text/javascript");
+		httpResponse.getWriter().write(" function alertMan(msg) { \n alert(\"message:\"+msg); \n } ");
 	}
 	
 	public static void writeFileReponse(HttpServletResponse httpResponse, File file) throws  Exception {

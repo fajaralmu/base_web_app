@@ -1,7 +1,6 @@
 package com.fajar.entitymanagement.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -10,112 +9,126 @@ import org.springframework.stereotype.Service;
 
 import com.fajar.entitymanagement.dto.WebRequest;
 import com.fajar.entitymanagement.dto.WebResponse;
+import com.fajar.entitymanagement.entity.BaseEntity;
 import com.fajar.entitymanagement.entity.Menu;
 import com.fajar.entitymanagement.entity.Page;
-import com.fajar.entitymanagement.entity.ProductCategory;
+import com.fajar.entitymanagement.entity.Sequenced;
 import com.fajar.entitymanagement.entity.User;
 import com.fajar.entitymanagement.entity.UserRole;
+import com.fajar.entitymanagement.entity.setting.EntityManagementConfig;
 import com.fajar.entitymanagement.repository.EntityRepository;
 import com.fajar.entitymanagement.repository.MenuRepository;
 import com.fajar.entitymanagement.repository.PageRepository;
-import com.fajar.entitymanagement.repository.ProductCategoryRepository;
+import com.fajar.entitymanagement.service.entity.EntityValidation;
+import com.fajar.entitymanagement.service.sessions.SessionValidationService;
 import com.fajar.entitymanagement.util.CollectionUtil;
-import com.fajar.entitymanagement.util.EntityUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class ComponentService {
-
+public class ComponentService { 
+	
+	private static final String SETTING = "setting";
 	@Autowired
-	private ProductCategoryRepository categoryRepository;
+	private MenuRepository menuRepository;  
 	@Autowired
-	private UserSessionService userSessionService;
+	private SessionValidationService sessionValidationService;
 	@Autowired
 	private UserAccountService userAccountService;
 	@Autowired
-	private EntityRepository entityRepository; 
-	@Autowired
 	private PageRepository pageRepository; 
 	@Autowired
-	private MenuRepository menuRepository; 
-	 
-	public List<Page> getPages(HttpServletRequest request) {
+	private EntityRepository entityRepository;
 
-		boolean hasSession = userSessionService.hasSession(request);
-
-		if (hasSession)
+	public List<Page> getPages(HttpServletRequest request){
+		
+		boolean hasSession = sessionValidationService.hasSession(request);
+		
+		if(hasSession)
 			return pageRepository.findByOrderBySequenceAsc();
 		else
-			return pageRepository.findByAuthorized(0);
+			return pageRepository.findByAuthorizedOrderBySequenceAsc(0);
 	}
-
+	
 	/**
 	 * get page code
-	 * 
 	 * @param request
 	 * @return
 	 */
 	public String getPageCode(HttpServletRequest request) {
 		String uri = request.getRequestURI();
 		String link = uri.replace(request.getContextPath(), "");
-
-		log.info("get page from DB with link: {}", link);
+		
+		log.info("link: {}", link);
 		Page page = pageRepository.findTop1ByLink(link);
-
+		
 		log.info("page from db : {}", page);
-		if (null == page) {
+		if(null == page) {
 			return "";
 		}
-
+		
 		log.info("page code found: {}", page.getCode());
 		return page.getCode();
 	}
-
-	public List<Page> getAllPages() {
-		return pageRepository.findAll();
+	
+	public List<Page> getAllPages() { 
+		return pageRepository.findAll(); 
 	}
+	
  
-	public Page getPage(String code, HttpServletRequest request) {
-		Page page = pageRepository.findByCode(code);
-
-		if (page.getAuthorized() == 1 && !userSessionService.hasSession(request)) {
-
+	
+	public Page getPage(String code, HttpServletRequest request) { 
+		Page page = pageRepository.findByCode(code); 
+		
+		if (page.getAuthorized() == 1 && !sessionValidationService.hasSession(request)) {
+			
 			return null;
 		}
-
+		
 		List<Menu> menus = getMenuListByPageCode(code);
-		page.setMenus(menus);
+		page.setMenus(menus );
 		return page;
-	}
-
+	} 
+	
 	public WebResponse getMenuByPageCode(String pageCode) {
 
 		List<Menu> menus = getMenuListByPageCode(pageCode);
 
 		return WebResponse.builder().entities(CollectionUtil.convertList(menus)).build();
 	}
-
 	
-
+	private Menu defaultMenu() {
+		Menu menu = new Menu();
+		menu.setCode("000");
+		menu.setName("Menu Management");
+		menu.setUrl("/management/menu");
+		Page menuPage = pageRepository.findByCode(SETTING);
+		menu.setMenuPage(menuPage);
+		return menu;
+	}
+	
 	public List<Menu> getMenuListByPageCode(String pageCode) {
 
 		List<Menu> menus = menuRepository.findByMenuPage_code(pageCode);
 
 		if (menus == null || menus.size() == 0) {
 
-			 log.debug("NO MENU WITH PAGE CODE: {}", pageCode);
+			if (pageCode.equals(SETTING)) {
+				Menu menu = defaultMenu();
+				final Menu savedMenu = entityRepository.save(menu);
+				return CollectionUtil.listOf(savedMenu);			
+			}
 		}
 
-		EntityUtil.validateDefaultValues(menus);
+		EntityValidation.validateDefaultValues(menus, entityRepository);
 		return menus;
 	}
-
+	 
 	private boolean hasAccess(User user, String menuAccess) {
 		UserRole userRole = userAccountService.getRole(user);
 		boolean hasAccess = false;
-
+		
 		for (String userAccess : userRole.getAccess().split(",")) {
 			if (userAccess.equals(menuAccess)) {
 				hasAccess = true;
@@ -124,22 +137,21 @@ public class ComponentService {
 		}
 
 		return hasAccess;
-	} 
-	
-	public List<ProductCategory> getAllCategories() {
-		return categoryRepository.findByDeletedFalse();
 	}
+
+ 
  
 
-	public WebResponse savePageSequence(WebRequest request) {
+	public WebResponse saveEntitySequence(WebRequest request, String entityName) {
 
-		List<Page> pages = request.getPages();
-
+		List<BaseEntity> orderedEntities = request.getOrderedEntities();
+		EntityManagementConfig entityConfig = entityRepository.getConfig(entityName);
+		Class<? extends BaseEntity> cls = entityConfig.getEntityClass();
 		try {
 
-			for (int i = 0; i < pages.size(); i++) {
-				Page page = pages.get(i);
-				updateSequence(i, page.getId());
+			for (int i = 0; i < orderedEntities.size(); i++) {
+				BaseEntity page = orderedEntities.get(i);
+				updateSequence(i, page.getId(), cls);
 			}
 
 			WebResponse response = WebResponse.success();
@@ -152,14 +164,16 @@ public class ComponentService {
 		}
 	}
 
-	private void updateSequence(int sequence, Long id) {
-
-		Optional<Page> pageDB = pageRepository.findById(id);
-		if (pageDB.isPresent()) {
-			Page page = pageDB.get();
-			page.setSequence(sequence);
-			entityRepository.save(page);
+	private void updateSequence(int sequence, Long id, Class<? extends BaseEntity> cls) {
+		
+		final BaseEntity dbRecord = entityRepository.findById(cls, id);
+		if (dbRecord != null) {
+			 
+			((Sequenced)dbRecord).setSequence(sequence);
+			entityRepository.save(dbRecord);
 		}
 	} 
+
+	
 
 }

@@ -51,11 +51,11 @@
 
 <script type="text/javascript">
 	var ctxPath = "${contextPath}";
-	const usernameField = _byId("useraname");
-	const nameField = _byId("name");
-	const passwordField = _byId("password");
-	const rePasswordField = _byId("re_password");
-	const usernameAvailabilityInfo = _byId("user-availability");
+	const usernameField = byId("useraname");
+	const nameField = byId("name");
+	const passwordField = byId("password");
+	const rePasswordField = byId("re_password");
+	const usernameAvailabilityInfo = byId("user-availability");
 
 	usernameField.onkeyup = function(e) {
 		checkUsername(e.target.value);

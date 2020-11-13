@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import com.fajar.entitymanagement.dto.WebRequest;
 import com.fajar.entitymanagement.dto.WebResponse;
 
 @Service
@@ -14,9 +13,7 @@ public class RealtimeService2 {
 	Logger log = LoggerFactory.getLogger(RealtimeService2.class);
 
 	@Autowired
-	private SimpMessagingTemplate webSocket; 
-	@Autowired
-	private UserSessionService userSessionService;
+	private SimpMessagingTemplate webSocket;  
 
 	public RealtimeService2() {
 		LogProxyFactory.setLoggers(this);
@@ -41,31 +38,15 @@ public class RealtimeService2 {
 	}
 
 
-	public void sendMessageChat(WebResponse response) {
-		webSocket.convertAndSend("/wsResp/messages", response); 
+	public void sendMessageChatToClient(WebResponse response, String requestId) {
+		webSocket.convertAndSend("/wsResp/messages/"+requestId, response); 
+	}
+	 
+ 
+	public void sendChatMessageToAdmin(WebResponse response) {
+		webSocket.convertAndSend("/wsResp/adminmessages", response); 
 	}
 	
-	private void sendLiveStramResponse(WebResponse response) {
-		webSocket.convertAndSend("/wsResp/videostream/"+response.getRequestId(), response);
-	}
-
-
-	public WebResponse stream(WebRequest request) {
-		WebResponse response = new WebResponse();
-		
-		response.setImageData(request.getImageData());
-		response.setRequestId(request.getOriginId());
-		
-		sendLiveStramResponse(response);
-		return response;
-	}
-
-
-	public void disconnectLiveStream(WebRequest request) {
-		 
-		userSessionService.setActiveSession(request.getOriginId(), false);
-		WebResponse response = WebResponse.builder().code("01").requestId(request.getOriginId()).build();
-		sendLiveStramResponse(response );
-	}
+	
 
 }

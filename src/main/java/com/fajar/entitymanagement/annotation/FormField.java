@@ -12,24 +12,24 @@ import com.fajar.entitymanagement.dto.FieldType;
 public @interface FormField {
  
 	
-	public FieldType type() default FieldType.FIELD_TYPE_TEXT;
+	public FieldType type() default FieldType.FIELD_TYPE_TEXT; 
 	
-	public boolean showDetail() default false;
-	
-	//multiple image
-	public boolean multiple() default false;
-
-	public boolean required() default true;
-
-	public String lableName() default "";
-
-	public String optionItemName() default ""; 
-
-	public String defaultValue() default "";
-
+	public String lableName() default ""; 
+	public String optionItemName() default "";  
+	public String defaultValue() default ""; 
 	public String[] availableValues() default {};
 	public String[] detailFields() default {}; 
 	public String[] multiply() default {};
+	
+	public boolean showDetail() default false;  
+	public boolean multipleImage() default false; 
+	public boolean required() default true;  
 	public boolean emptyAble() default true;
+	public boolean multipleSelect() default false;
+	public boolean iconImage() default false;
+	
+	public boolean hasPreview() default false;
+	//LINK = /api/component/{previewLink}/{elementValue}
+	public String previewLink() default "";
 
 }

@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LogProxyFactory {
 
-	private static final DefaultParameterNameDiscoverer discoverer = new DefaultParameterNameDiscoverer();
+	public static final DefaultParameterNameDiscoverer discoverer = new DefaultParameterNameDiscoverer();
 	
 	public static void setLoggers(Object obj) {
 		log.info("set logger to object: {}", obj.getClass());
@@ -70,7 +70,7 @@ public class LogProxyFactory {
 					String[] params = null;
 					try {
 						params = discoverer.getParameterNames(invocation.getMethod()); 
-					}catch ( Exception e) {
+					}catch ( Exception |  NoSuchMethodError e) {
 						// TODO: handle exception
 					}
 					if(params == null) {

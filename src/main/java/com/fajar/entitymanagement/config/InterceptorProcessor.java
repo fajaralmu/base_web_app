@@ -1,6 +1,5 @@
 package com.fajar.entitymanagement.config;
 
-import java.io.IOException;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,10 +21,10 @@ import com.fajar.entitymanagement.annotation.CustomRequestInfo;
 import com.fajar.entitymanagement.controller.BaseController;
 import com.fajar.entitymanagement.dto.WebResponse;
 import com.fajar.entitymanagement.entity.User;
-import com.fajar.entitymanagement.service.ComponentService;
 import com.fajar.entitymanagement.service.ProgressService;
 import com.fajar.entitymanagement.service.UserAccountService;
-import com.fajar.entitymanagement.service.UserSessionService;
+import com.fajar.entitymanagement.service.sessions.SessionValidationService;
+import com.fajar.entitymanagement.service.sessions.UserSessionService;
 import com.fajar.entitymanagement.util.SessionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -35,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 public class InterceptorProcessor {
 
 	@Autowired
+	private SessionValidationService sessionValidationService;
+	@Autowired
 	private UserSessionService userSessionService;
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -44,8 +46,6 @@ public class InterceptorProcessor {
 	private UserAccountService userAccountService;
 	@Autowired
 	private ProgressService progressService;
-	@Autowired
-	private ComponentService componentService;
 
 	public InterceptorProcessor() {
 
@@ -61,17 +61,18 @@ public class InterceptorProcessor {
 			} else {
 				msg = "Request Not Authenticated";
 			}
-			response.setStatus(400);
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			response.getWriter().write(objectMapper.writeValueAsString(WebResponse.failed(msg)));
 			response.setHeader("error_message", "Invalid Authentication");
-		} catch (IOException e) {
+		} catch ( Exception e) {
 			log.error("Error writing JSON Error Response: {}", e);
 		}
 	}
 
 	public boolean interceptApiRequest(HttpServletRequest request, HttpServletResponse response,
 			HandlerMethod handlerMethod) {
-
+		 
+		log.info("request Principal: {}", request.getUserPrincipal());
 		log.info("intercept api handler: {}", request.getRequestURI());
 
 		Authenticated authenticated = getAuthenticationAnnotation(handlerMethod);
@@ -89,7 +90,7 @@ public class InterceptorProcessor {
 				User authenticatedUser = getAuthenticatedUser(request);
 				SessionUtil.setUserInRequest(request, authenticatedUser);
 			} else {
-				if (!userSessionService.validatePageRequest(request)) {
+				if (!sessionValidationService.validatePageRequest(request)) {
 					printNotAuthenticated(response, loginRequired);
 					return false;
 				}
@@ -109,7 +110,7 @@ public class InterceptorProcessor {
 		if (authenticationRequired) {
 			if (!hasSessionToAccessWebPage(request)) {
 				log.info("URI: {} not authenticated, will redirect to login page", request.getRequestURI());
-				response.setStatus(301);
+				response.setStatus(HttpStatus.FOUND.value());
 				response.setHeader("location", request.getContextPath() + "/account/login");
 //				BaseController.sendRedirectLogin(request, response);
 				return false;
@@ -123,29 +124,11 @@ public class InterceptorProcessor {
 				progressService.init(SessionUtil.getPageRequestId(request));
 			}
 		}
-
-		this.setActivePage(request);
+ 
 		return true;
-	}
-
-	private void setActivePage(HttpServletRequest httpServletRequest) { 
-		String pageCode = componentService.getPageCode(httpServletRequest);
-		userSessionService.setActivePage(httpServletRequest, pageCode);
-	}
-
+	} 
 	public static void main(String[] args) throws Exception {
 
-//		MvcManagementController controller = new MvcManagementController();
-//		Method method = controller.getClass().getMethod("commonPage", String.class, Model.class, HttpServletRequest.class, HttpServletResponse.class);
-//		method.setAccessible(true);
-//		HandlerMethod hm = new HandlerMethod(controller, method);
-//		
-//		InterceptorProcessor ip = new InterceptorProcessor();
-//		Authenticated annotation = ip.getAuthenticationAnnotation(hm);
-//		
-//		Class<?> _class = hm.getBeanType();
-//		Authenticated ano = _class.getAnnotation(Authenticated.class);
-//		log.info("annotation: {}", annotation);
 	}
 
 	public static Authenticated getAuthenticationAnnotation(HandlerMethod handlerMethod) {
@@ -197,7 +180,7 @@ public class InterceptorProcessor {
 	}
 
 	private boolean hasSessionToAccessWebPage(HttpServletRequest request) {
-		return userSessionService.hasSession(request);
+		return sessionValidationService.hasSession(request);
 	}
 
 	//// https://stackoverflow.com/questions/45595203/how-i-get-the-handlermethod-matchs-a-httpservletrequest-in-a-filter

@@ -75,28 +75,13 @@ public class MenuInitiationService {
 
 		if (MenuRepository.findByCode(menuCode) == null) {
 
-			Menu adminMenu = constructAdminMenu(baseMapping, method);
+			Menu adminMenu = MvcUtil.constructAdminMenu(baseMapping, method, webConfigService.defaultAdminPage());
 			MenuRepository.save(adminMenu);
 		}
 
 	}
 
-	private Menu constructAdminMenu(String baseMapping, Method method) {
-		RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-
-		log.info("constructAdminMenu: {} url: /{}", method.getName(), requestMapping.value());
-
-		Menu adminMenu = new Menu();
-		adminMenu.setCode(method.getName().toLowerCase());
-		adminMenu.setColor("#ffffff");
-		adminMenu.setFontColor("#000000");
-		adminMenu.setDescription(StringUtil.extractCamelCase(method.getName()));
-		adminMenu.setName(StringUtil.extractCamelCase(method.getName()));
-		adminMenu.setUrl("/"+baseMapping+"/" + requestMapping.value()[0]);
-		adminMenu.setMenuPage(webConfigService.defaultAdminPage());
-
-		return adminMenu;
-	}
+	
 
 	private void checkManagementPage() {
 
@@ -146,11 +131,11 @@ public class MenuInitiationService {
 
 		boolean commonPage = dto.commonManagementPage();
 		String menuCode = entityClass.getSimpleName().toLowerCase();
+		Page menuPage = getPageByCode(MANAGEMENT);
 
 		Menu menu = new Menu();
 		menu.setCode(menuCode);
-		menu.setName(StringUtil.extractCamelCase(entityClass.getSimpleName()) + " Management"); 
-		Page menuPage = getPageByCode(MANAGEMENT);
+		menu.setName(StringUtil.extractCamelCase(entityClass.getSimpleName()) + " Management");  
 		menu.setMenuPage(menuPage);
 		menu.setColor("#ffffff");
 		menu.setFontColor("#000000");

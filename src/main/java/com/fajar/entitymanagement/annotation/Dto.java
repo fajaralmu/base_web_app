@@ -6,8 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.fajar.entitymanagement.dto.FormInputColumn;
-import com.fajar.entitymanagement.service.entity.BaseEntityUpdateService;
-import com.fajar.entitymanagement.service.entity.CommonUpdateService;
 
 @Retention(RetentionPolicy.RUNTIME)  
 @Target(ElementType.TYPE)  
@@ -18,7 +16,7 @@ public @interface Dto {
 	boolean editable() default true;
 	String value() default "";
 	boolean quistionare() default false;
-	Class<? extends BaseEntityUpdateService> updateService() default CommonUpdateService.class;
-	public boolean commonManagementPage() default true;
+	String updateService() default "commonUpdateService";
+	public boolean commonManagementPage() default true; 
 	 
 }

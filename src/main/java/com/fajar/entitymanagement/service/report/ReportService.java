@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.fajar.entitymanagement.dto.WebRequest;
 import com.fajar.entitymanagement.dto.WebResponse;
-import com.fajar.entitymanagement.service.EntityService;
 import com.fajar.entitymanagement.service.ProgressService;
+import com.fajar.entitymanagement.service.entity.EntityService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +28,7 @@ public class ReportService {
 		log.info("generateEntityReport");
 //		request.getFilter().setLimit(0); 
 
-		WebResponse response = entityService.filter(request);
+		WebResponse response = entityService.filter(request, httpRequest);
 
 		progressService.sendProgress(1, 1, 20, true, httpRequest);
 

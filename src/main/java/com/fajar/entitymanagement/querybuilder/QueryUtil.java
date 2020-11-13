@@ -17,7 +17,7 @@ import javax.persistence.Table;
 import com.fajar.entitymanagement.annotation.CustomEntity;
 import com.fajar.entitymanagement.annotation.FormField;
 import com.fajar.entitymanagement.dto.Filter;
-import com.fajar.entitymanagement.dto.KeyPair;
+import com.fajar.entitymanagement.dto.KeyValue;
 import com.fajar.entitymanagement.entity.BaseEntity;
 import com.fajar.entitymanagement.util.EntityUtil;
 import com.fajar.entitymanagement.util.StringUtil;
@@ -164,7 +164,7 @@ public class QueryUtil {
 
 				currentType = currentField.getType();
 
-			} catch ( Exception e) {
+			} catch (NoSuchFieldException | SecurityException e) {
 				e.printStackTrace();
 			}
 
@@ -221,7 +221,7 @@ public class QueryUtil {
 			}
 			
 			String filterColumnName = getColumnName(field); 
-			KeyPair<String, Object> joinColumnResult = checkIfJoinColumn(currentKey, field, false);
+			KeyValue joinColumnResult = checkIfJoinColumn(currentKey, field, false);
 			
 			if(null != joinColumnResult) {
 				if(joinColumnResult.isValid()) {
@@ -249,10 +249,10 @@ public class QueryUtil {
 	 * @param actualColumnName
 	 * @return
 	 */
-	public static KeyPair<String, Object> checkIfJoinColumn(String currentKey, Field field, boolean actualColumnName) {
+	public static KeyValue checkIfJoinColumn(String currentKey, Field field, boolean actualColumnName) {
 		
 		String multiKeyColumnName = getMultiKeyColumnName(currentKey);
-		KeyPair<String, Object> keyValue = new KeyPair<String, Object>();
+		KeyValue keyValue = new KeyValue();
 		boolean isMultiKey 	= null != multiKeyColumnName; 
 		boolean validColumn = false;
 		
@@ -356,7 +356,7 @@ public class QueryUtil {
 	 * @param filter
 	 * @return
 	 */
-	private static QueryFilterItem getDateFilter(String rawKey, String key, List<Field > fields, Map<String, Object> filter) {
+	private static QueryFilterItem getDateFilter(String rawKey, String key, List<Field > fields, Map filter) {
 		boolean dayFilter 	= rawKey.endsWith(DAY_SUFFIX);
 		boolean monthFilter = rawKey.endsWith(MONTH_SUFFIX);
 		boolean yearFilter 	= rawKey.endsWith(YEAR_SUFFIX);

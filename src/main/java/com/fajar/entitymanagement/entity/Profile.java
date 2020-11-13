@@ -4,24 +4,24 @@ import static com.fajar.entitymanagement.dto.FieldType.FIELD_TYPE_TEXTAREA;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 import com.fajar.entitymanagement.annotation.Dto;
 import com.fajar.entitymanagement.annotation.FormField;
 import com.fajar.entitymanagement.dto.FieldType;
-import com.fajar.entitymanagement.service.entity.ProfileUpdateService;
+import com.fajar.entitymanagement.dto.FontAwesomeIcon;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@Dto(ignoreBaseField = false, updateService = ProfileUpdateService.class)
+@Dto(ignoreBaseField = false, updateService = "shopProfileUpdateService")
 @Entity
-@Table(name = "app_profile")
+@Table(name = "shop_profile")
 @Data
-@EqualsAndHashCode(callSuper = false)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,7 +34,7 @@ public class Profile extends BaseEntity {
 	@Column 
 	@FormField
 	private String name;
-	@Column(name = "app_code", unique = true)
+	@Column(name = "mart_code", unique = true)
 	@FormField(type = FieldType.FIELD_TYPE_HIDDEN)
 	private String appCode;
 	@Column(name = "short_description")
@@ -59,8 +59,24 @@ public class Profile extends BaseEntity {
 	@FormField(type = FieldType.FIELD_TYPE_IMAGE, required = false, defaultValue = "DefaultIcon.BMP")
 	@Column(name = "icon_url")
 	private String iconUrl;
+	@FormField(type = FieldType.FIELD_TYPE_IMAGE, iconImage = true, required = false, defaultValue = "DefaultIcon.BMP")
+	@Column(name = "page_icon_url")
+	private String pageIcon;
 	@FormField(type = FieldType.FIELD_TYPE_IMAGE, required = false, defaultValue = "DefaultBackground.BMP")
 	@Column(name = "background_url")
 	private String backgroundUrl;
+	@FormField(type = FieldType.FIELD_TYPE_PLAIN_LIST, hasPreview = true, previewLink = "fa-preview" , required = false, defaultValue = "home")
+	@Column(name= "footer_icon_class")
+	@Enumerated(EnumType.STRING) 
+	private FontAwesomeIcon footerIconClass; 
+	
+	public String getFooterIconClassValue() {
+		if(null == footerIconClass) {
+			return "fa fa-home"; 
+		}
+		return footerIconClass.value;
+	}
+	
+	
 
 }

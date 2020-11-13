@@ -1,5 +1,7 @@
 package com.fajar.entitymanagement.util;
 
+import static com.fajar.entitymanagement.util.CollectionUtil.reverse;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -8,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fajar.entitymanagement.dto.KeyPair;
+import com.fajar.entitymanagement.dto.KeyValue;
 
 public class DateUtil {
 
@@ -64,13 +66,28 @@ public class DateUtil {
 		return getCalendarItem(date, Calendar.MONTH);
 	}
 	
+	public static int getCurrentYear() {
+		return getCalendarYear(new Date());
+	}
+	
+	/**
+	 * month starts at 0
+	 * @return
+	 */
+	public static int getCurrentMonth() {
+		return getCalendarMonth(new Date());
+	}
+	
 	public static int getCalendarDayOfMonth(Date date) {
 		return getCalendarItem(date, Calendar.DAY_OF_MONTH);
 	}
+	
+	static Integer[] kabisatMonths = new Integer[] { 31, (  29  ), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	static Integer[] regularMonths = new Integer[] { 31, (  28  ), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 	public static Integer[] getMonthsDay(int year) {
 		boolean kabisat = year % 4 == 0;
-		return new Integer[] { 31, (kabisat ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+		return  kabisat ? kabisatMonths : regularMonths;
 	}
 	
 	public static final String[] MONTH_NAMES = new String[] {
@@ -88,8 +105,9 @@ public class DateUtil {
 		"Desember"
 	};
 	
-	public static List<KeyPair<String, Integer>> months(){
-		return new ArrayList<KeyPair<String, Integer>>() {
+	public static List<KeyValue<String, Integer>> months(){
+		
+		return new ArrayList<KeyValue<String, Integer>>() {
 			/**
 			 * 
 			 */
@@ -97,7 +115,7 @@ public class DateUtil {
 
 			{
 				for (int i = 1; i <=12; i++) {
-					add(new KeyPair<String, Integer>(MONTH_NAMES[i - 1] + "("+i+")", i, true));
+					add(new KeyValue<String, Integer>(MONTH_NAMES[i - 1] + "("+i+")", i, true));
 				}
 			}
 		};
@@ -188,4 +206,103 @@ public class DateUtil {
 		return result ;
 	}
 
+	public static List<KeyValue<Integer, Integer>> yearArray(int minYear, int i) {
+		
+		List<KeyValue<Integer, Integer>> years = new ArrayList<>();
+		for (int j = minYear; j <= i; j++) {
+			years.add(new KeyValue<Integer, Integer>(j, j, true));
+		}
+		return years ;
+	}
+
+	/**
+	 * 
+	 * @param m0 from month
+	 * @param y0 from year
+	 * @param m1 to month
+	 * @param y1 to year
+	 * @return
+	 */
+	public static int getDiffMonth(int m0, int y0, int m1, int y1) {
+		int diff = 0;
+		for (int i = y0; i <= y1; i++) {
+
+			int beginMonth = 1; 
+			if (i == y0) { 
+				beginMonth = m0;
+			}
+
+			for (int j = beginMonth; j <= 12; j++) { 
+				if (i == y1 && j == m1) { 
+					return diff;
+				}
+				diff++;
+			}
+
+		}
+		return diff;
+	}
+	
+	/**
+	 * get difference day from now
+	 * @param date
+	 * @return
+	 */
+	public static long getDiffDaysFromNow(Date date) {
+		long diff = new Date().getTime() - date.getTime();
+		long diffDays = diff / (24 * 60 * 60 * 1000);
+		return diffDays;
+	}
+	
+	/**
+	 * get list of months with length: diff
+	 * @param calendar
+	 * @param diff
+	 * @return
+	 */
+	public static List<int[]> getMonths(Calendar calendar, int diff) {
+
+		Integer currentMonth = calendar.get(Calendar.MONTH) + 1;
+		Integer currentYear = calendar.get(Calendar.YEAR);
+		List<int[]> periods = new ArrayList<>();
+		String monthString = currentMonth >= 10 ? currentMonth.toString() : "0" + currentMonth;
+
+		periods.add(new int[] { currentYear, Integer.parseInt(monthString) });
+
+		for (int i = 1; i <= diff  ; i++) {
+			currentMonth--;
+			if (currentMonth <= 0) {
+				currentMonth = 12;
+				currentYear--;
+			}
+			monthString = currentMonth >= 10 ? currentMonth.toString() : "0" + currentMonth;
+			periods.add(new int[] { currentYear, Integer.parseInt(monthString) });
+		}
+		return reverse(periods);
+	}
+	
+	/**
+	 * get day of month count
+	 * @param year
+	 * @param month
+	 * @return
+	 */
+	public static int getMonthDayCount(int year, int month) {
+		
+		int day = 30;
+		
+		if(month == 2 && year % 4 == 0) {
+			return 29;
+		}else if(month == 2) {
+			return 28;
+		}
+		
+		if(month < 8 && month % 2 != 0) {
+			return 30;
+		}else if(month >= 8 && month % 2 == 0) {
+			return 31;
+		}
+		
+		return day;
+	}
 }

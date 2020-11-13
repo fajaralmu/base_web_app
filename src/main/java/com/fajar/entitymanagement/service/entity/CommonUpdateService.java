@@ -37,7 +37,7 @@ public class CommonUpdateService extends BaseEntityUpdateService<BaseEntity> {
 	 * @param updateInterceptor
 	 */
 	private void interceptPreUpdate(BaseEntity entity ) {
-		EntityUpdateInterceptor<BaseEntity> updateInterceptor = entity.getUpdateInterceptor();
+		EntityUpdateInterceptor<BaseEntity> updateInterceptor = entity.modelUpdateInterceptor();
 		if (null != updateInterceptor && null != entity) {
 			log.info("Pre Update {}", entity.getClass().getSimpleName());
 			try {

@@ -4,7 +4,7 @@ const monthNames = ["January", "February", "March", "April", "May", "June",
 	  "July", "August", "September", "October", "November", "December"
 	];
 
-function _byId(id){
+function byId(id){
 	if(id==null || id == ""){
 		console.warn("ID IS EMPTY");
 	}
@@ -14,27 +14,13 @@ function _byId(id){
 const loadingDiv = createDiv('loading-div','loading_div');
 
 function infoLoading() {
-	 
+	console.log("infoLoading..");
 	document.body.prepend(loadingDiv);
-	
-	loadingDiv.innerHTML = "";
-	const loadingText = createHtmlTag({
-		tagName:'div',
-		id:'loading-txt',
-		innerHTML:'Please Wait'
-	}); 
-	loadingDiv.appendChild(loadingText); 
-	const imagePath = ctxPath+"/res/img/loading-disk.gif";
-	const loadingImg = createHtmlTag({
-		tagName: "img",
-		src: imagePath,
-		style: {height: '70px', width: '70px'},
-		onload: function(){
-			loadingText.innerHTML = "";
-		}
-	}); 
-	
-	loadingDiv.appendChild(loadingImg);
+	loadingDiv.style.zIndex = 1500;
+	loadingDiv.innerHTML = `<button class="btn btn-info">
+		  <span class="spinner-border spinner-border-sm"></span>
+		  Loading..
+		</button>`;
 }
 
 function infoDone() {
@@ -106,8 +92,8 @@ function clearElement(...elements){
 		}
 		
 		if(typeof(element) == "string"){
-			if(_byId(element)){
-				element = _byId(element);
+			if(byId(element)){
+				element = byId(element);
 			}
 		}
 		
@@ -115,8 +101,13 @@ function clearElement(...elements){
 			continue;
 		}
 		
-		if(element.tagName == "input" || element.tagName == "textarea"){
-			element.value = "";
+		if(element.tagName.toLowerCase() == "input" || element.tagName.toLowerCase() == "textarea"){
+			if(element.type.toLowerCase() == "number"){
+				element.value = 0;
+			}else{
+				element.value = "";
+			}
+			
 		}else{
 			element.innerHTML = "";
 		}
@@ -136,11 +127,11 @@ function createInputText(id, className){
 }
 
 function hide(id){
-	_byId(id).style.display = "none";
+	byId(id).style.display = "none";
 }
 
 function show(id){
-	_byId(id).style.display = "block";
+	byId(id).style.display = "block";
 }
 	 
 
@@ -168,8 +159,11 @@ function createEmptySpan(){
 	return createHtmlTag({tagName: "span", innerHTML: ""});
 }
 
-function createDiv(id, className){
+function createDiv(id, className, html){
 	let div = createElement("div", id, className); 
+	if(html){
+		div.innerHTML = html;
+	}
 	return div;
 }
 
@@ -226,7 +220,7 @@ function createGridWrapper(cols, width){
 	}else{
 		gridTemplateColumns = (width+" ").repeat(cols);
 	}
-	const domObj = {tagName:"div", style:{display:grid, gridTemplateColumns:gridTemplateColumns}}; 
+	const domObj = {tagName:"div", style:{display:'grid', 'grid-template-columns':gridTemplateColumns}}; 
 	return createHtmlTag(domObj);
 }
 
@@ -288,7 +282,7 @@ function createHtmlTag(object){
 			if(isStyle){
 				tag.setAttribute(key, stringifyStyleObject(value));
 			}else{ // Html DOM
-				console.debug("will create HTML DOM of :", key);
+				//console.debug("will create HTML DOM of :", key);
 				const htmlObject = value;
 				const htmlTag = createHtmlTag(htmlObject);
 				tag.appendChild(htmlTag);
@@ -298,6 +292,9 @@ function createHtmlTag(object){
 			tag[key] = function(e){ value(e) };
 			 
 		}else{
+			if(key == "className"){
+				key = "class";
+			}
 			tag.setAttribute(key, value);
 		}
 	}
@@ -384,9 +381,9 @@ function createTableBody(columns, entities, beginNumber,ignoreNumber){
 		for (let i = 0; i < columns.length; i++) {
 			let column = columns[i];
 			let isUrl = false;
-			if(column.includes("setting=")){
-				let setting = column.split("setting=")[1];
-				column = column.split("setting=")[0].trim();
+			if(column.includes("ATTRIBUTE>>")){
+				let setting = column.split("ATTRIBUTE>>")[1];
+				column = column.split("ATTRIBUTE>>")[0].trim();
 				
 				if(setting.includes("link")){
 					isUrl = true;	
@@ -411,7 +408,7 @@ function createTableBody(columns, entities, beginNumber,ignoreNumber){
 			isUrl = typeof (entityValue) == "string" && (entityValue.trim().startsWith("http://") || entityValue.trim().startsWith("https://"));
 			
 			if(notNull && isUrl){
-				entityValue  ="<a href=\""+entityValue+"\">"+entityValue+"</a>";
+				entityValue  ="<a class=\"btn\" href=\""+entityValue+"\">"+entityValue+"</a>";
 			}
 			cell.innerHTML = entityValue;
 			row.append(cell);
@@ -427,7 +424,7 @@ const TYPE_DAY = "day";
 const TYPE_MONTH = "month";
 const TYPE_YEAR = "year";
 
-function createPeriodFilterInput(fieldName, type, callback){
+function createPeriodFilterInput(fieldName, type, onkeyupCallback){
 	const id = "filter-" + fieldName + "-" + type;
 	 
 	const inputDay = createHtmlTag({
@@ -438,19 +435,22 @@ function createPeriodFilterInput(fieldName, type, callback){
 		'field': fieldName + "-"+ type,
 		'style': "width: 30%"
 	});
-	inputDay.onkeyup = function() { callback(); }
+	if(onkeyupCallback){
+		inputDay.onkeyup = function() { onkeyupCallback(); }
+	}
+	
 	
 	return inputDay;
 }
 
-function createFilterInputDate(fieldName, callback){
+function createFilterInputDate(fieldName, onkeyupCallback){
 	const inputGroup = createDiv("input-group-"+fieldName,"input-group input-group-sm mb-3"); 
 	// input day
-	let inputDay = createPeriodFilterInput(fieldName, TYPE_DAY, callback); 
+	let inputDay = createPeriodFilterInput(fieldName, TYPE_DAY, onkeyupCallback); 
 	// input month
-	let inputMonth = createPeriodFilterInput(fieldName, TYPE_MONTH, callback); 
+	let inputMonth = createPeriodFilterInput(fieldName, TYPE_MONTH, onkeyupCallback); 
 	// input year
-	let inputYear = createPeriodFilterInput(fieldName, TYPE_YEAR, callback); 
+	let inputYear = createPeriodFilterInput(fieldName, TYPE_YEAR, onkeyupCallback); 
 	
 	inputGroup.append(inputDay);
 	inputGroup.append(inputMonth);
@@ -468,36 +468,35 @@ function randomID(){
 
 /**
  * 
- * @param rowList
+ * @param rowList 2 dimensional array
  * @returns <tbody>
  */
 function createTBodyWithGivenValue(rowList){
 	const tbody = createElement("tbody",randomID(),null);
 	
+	//rows
 	for (var i = 0; i < rowList.length; i++) {
 		const columns = rowList[i];
 		const row = createElement("tr");
 		
+		//columns
 		for (var j = 0; j < columns.length; j++) {
 			let cell = columns[j];
 			const column = createElement("td");
 			
-			if(null!=cell && typeof(cell) == "string" && cell.includes("setting=")){
-				var setting = cell.split("setting=")[1];
-				// colspan
-				if(setting.includes("<colspan>")){
-					var collspan = setting.split("<colspan>")[1];
-					column.setAttribute("colspan",collspan.split("</colspan>")[0]);
-				}
-				// style
-				if(setting.includes("<style>")){
-					var style = setting.split("<style>")[1].split("</style>")[0];
-					column.setAttribute("style",style);
-				}
+			if(null != cell && typeof(cell) == "string" && cell.includes("ATTRIBUTE>>")){
+				const rawAttribute = cell.split("ATTRIBUTE>>")[1];
+				const attribute = rawAttribute.split(",");
 				
-				cell = cell.split("setting=")[0];
+				for (var a = 0; a < attribute.length; a++) {
+					try{
+						const keyVal = attribute[a].split("=");
+						column.setAttribute(keyVal[0], keyVal[1]);
+					}catch(e){ }
+				}
+				cell = cell.split("ATTRIBUTE>>")[0];
 			}
-			if(cell!=null && typeof(cell) == "number"){
+			if(cell != null && typeof(cell) == "number"){
 				cell = beautifyNominal(cell);
 			}
 			column.innerHTML = cell;
@@ -510,6 +509,9 @@ function createTBodyWithGivenValue(rowList){
 }
 
 function beautifyNominal(val) {
+	if(!val || val == 0){
+		return "0";
+	}
 	let nominal = ""+val;
 	let result = "";
 	if (nominal.length > 3) {
@@ -611,17 +613,42 @@ function getNextPage(currentPage, buttonCount){
 	return currentPageIsLastPage ? currentPage : currentPage + 1;
 }
 
-function isOneOfInputFieldEmpty(...inputfields ){
-	
+function isOneOfInputFieldEmpty(...inputfields ){ 
 	for (var i = 0; i < inputfields.length; i++) {
 		const input = inputfields[i];
 		if(input.value == null || input.value.trim() == ""){
 			return true;
-		}
-		
-	}
-	
-	return false;
-	
+		} 
+	} 
+	return false; 
 }
+
+
+
+function createBr() {
+	return document.createElement("br");
+}
+
+function getCookie(key){
+    try{
+       return document.cookie
+            .split('; ')
+            .find(row => row.startsWith(key))
+            .split('=')[1];
+    }catch(e){
+        return null;
+    }
+}
+
+function getDocumentHeight(){
+
+	var body = document.body,
+	html = document.documentElement;
+
+	var height = Math.max( body.scrollHeight, body.offsetHeight, 
+	                   html.clientHeight, html.scrollHeight, html.offsetHeight );
+	
+	return height;
+}
+
 

@@ -1,5 +1,5 @@
 function postReq(url, requestObject, callback, blob) {
-	 infoLoading();
+	infoLoading();
 	var request = new XMLHttpRequest();
 	var param = JSON.stringify(requestObject);
 	request.open("POST", url, true);
@@ -17,7 +17,7 @@ function postReq(url, requestObject, callback, blob) {
 				infoDone();
 				return;
 			}
-			console.log("RESPONSE ", this.status, this);
+			console.debug("RESPONSE ", this.status, this);
 			try {
 				this['data'] = JSON.parse(this.responseText);
 			} catch (e) {
@@ -32,6 +32,37 @@ function postReq(url, requestObject, callback, blob) {
 	request.send(param);
 }
 
+function postReqHtmlResponse(url, requestObject, callback ) {
+	infoLoading();
+	var request = new XMLHttpRequest();
+	var param = JSON.stringify(requestObject);
+	request.open("POST", url, true);
+	request.setRequestHeader("Content-type", "application/json");
+	request.setRequestHeader("requestToken", document.getElementById("token-value").value);
+	request.setRequestHeader("requestId", document.getElementById("request-id").value);
+	 
+	request.onreadystatechange = function() {
+		
+		if (this.readyState == this.DONE) {
+			if(this.status != 200){
+				alert("Server Error");
+				infoDone();
+				return;
+			}
+			console.debug("RESPONSE ", this.status, this);
+			try {
+				this['data'] =  (this.responseText);
+			} catch (e) {
+				this['data'] = "{}";
+			}
+			callback(this);
+			infoDone();
+		}
+		 
+	}
+	request.send(param);
+}
+
 function loadEntityList(url, requestObject, callback) {
 	
 	postReq(url, requestObject,
@@ -42,7 +73,7 @@ function loadEntityList(url, requestObject, callback) {
 					callback(entities);
 
 				} else {
-					alert("data not found");
+					infoDialog("Data Not Found").then(function(e){ });
 				}
 				
 			});
@@ -75,9 +106,9 @@ function downloadFileFromResponse(xhr){
 
 /**CRUD OPERATION**/
 function doDeleteEntity(url, entityName, idField, entityId, callback) {
-	if(!confirm(" Are you sure want to Delete: "+ entityId+"?")){
-		return;
-	}
+//	if(!confirm(" Are you sure want to Delete: "+ entityId+"?")){
+//		return;
+//	}
 	var requestObject = {
 		"entity" : entityName,
 		"filter" : { }
@@ -90,10 +121,11 @@ function doDeleteEntity(url, entityName, idField, entityId, callback) {
 				var response = (xhr.data);
 				var code = response.code;
 				if (code == "00") {
-					alert("success deleted");
-					callback();
+					infoDialog("Success deleting").then(function(e){
+						callback();
+					});
 				} else {
-					alert("error deleting");
+					infoDialog("Error deleting").then(function(e){ });
 				}
 			});
 }
@@ -103,10 +135,11 @@ function doSubmit(url, requestObject, callback){
 			requestObject, function(xhr) {
 				var response = (xhr.data);
 				if (response != null && response.code == "00") {
-					alert("SUCCESS");
-					callback();
+					infoDialog("Success").then(function(e){
+						callback();
+					});
 				} else {
-					alert("FAILS");
+					infoDialog("Failed").then(function(e){ });
 				}
 				
 			});
@@ -122,7 +155,7 @@ function doGetDetail(url,requestObject, callback){
 				if (entities != null && entities[0] != null) {
 					callback(entities);
 				} else {
-					alert("data not found");
+					infoDialog("Data Not Found").then(function(e){ });
 				}
 			});
 }
@@ -136,7 +169,7 @@ function doGetById(url, requestObject, callback){
 				if (entities != null && entities[0] != null) {
 					callback(entities[0]);
 				} else {
-					alert("data not found");
+					infoDialog("Data Not Found").then(function(e){ });
 				}
 			});
 }
@@ -150,7 +183,7 @@ function doLoadDropDownItems(url, requestObject, callback){
 					callback(entities);
 
 				} else {
-					alert("data not found");
+					infoDialog("Data Not Found").then(function(e){ });
 				}
 			});
 }
